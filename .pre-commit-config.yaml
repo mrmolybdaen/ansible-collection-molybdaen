@@ -1,0 +1,56 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+      # Python specific helpers
+      - id: check-ast
+      - id: check-docstring-first
+      - id: double-quote-string-fixer
+      #- id: name-tests-test
+      - id: fix-byte-order-marker
+      # File format Linters
+      - id: check-json
+      - id: check-xml
+      - id: check-yaml
+      # Misc
+      - id: check-added-large-files
+      - id: check-executables-have-shebangs
+      - id: detect-private-key
+      # Line and file endings
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+  - repo: https://github.com/asottile/pyupgrade
+    rev: v3.15.1
+    hooks:
+      - id: pyupgrade
+        args: [--py312-plus]
+  - repo: https://github.com/pycqa/flake8
+    rev: 7.1.1  # pick a git hash / tag to point to
+    hooks:
+      - id: flake8
+    additional_dependencies:
+      - numpy
+      - hcloud
+      - django
+      - flake8-docstrings
+      - flake8-black
+      - flake8-bandit
+  - repo: local
+    hooks:
+      - id: pylint
+        name: pylint
+        entry: python3 -m pylint -rn -sn --load-plugins=pylint.extensions.docparams
+        language: python
+        types: [python]
+        exclude: 'migrations/.*'
+        additional_dependencies:
+          - pylint
+          - numpy
+          - hcloud
+          - django
+  - repo: https://github.com/Yelp/detect-secrets
+    rev: v1.5.0
+    hooks:
+      - id: detect-secrets
+        name: Detect secrets
+        args: ['--baseline', '.secrets.baseline']

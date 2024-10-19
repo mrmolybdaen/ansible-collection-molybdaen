@@ -1,0 +1,4 @@
+output/
+inventory
+integration/cloud-config-atlassian.ini
+integration/integration_config.yml
