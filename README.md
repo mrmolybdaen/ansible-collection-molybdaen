@@ -1,3 +1,22 @@
 # Ansible Collection - mrmolybdaen.molybdaen
 
-Documentation for the collection.
+This collection is a result of my work. It aims to standardize deployments of Debian based web servers, mostly LAMP stacks.
+
+The aim of this collection is to move from Infrastructure as Code (IaC) to a Configuration as Code model as well.
+This means host variables can be used to create YAML based configuration which will get translated via Jinja2 templates
+into the actual configuration format.
+
+Security is oriented on CIS benchmarks where available and is mostly optimized for web servers with a limited amount of confidential data.
+
+> **IMPORTANT:**
+> If your servers are running in an environment with high confidentiality, such as medical, finance, universities or
+> military sectors, you need to apply additional measures and may override some roles.
+
+> **WARNING:**
+> This role makes use of external repositories for MariaDB (from MariaDB maintainers), Apach2 and PHP (deb.sury.org) as
+> well as Nginx (nginx repos) and ISC BIND9 to provide all security relevant patches as well as feature updates.
+> This can be disabled via `maintainer_repositories: false`. If you do not define this variable it is set to `true`.
+
+Some roles focus on basic configuration and hardening which is not configurable.
+Where possible we use, aside of apparmor, Systemd unit overrides to secure processes. This adds another layer of security
+because Systemd will start processes which already have limited capabilities.
