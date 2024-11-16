@@ -1,0 +1,30 @@
+---
+
+# Copyright: (c) 2024, Christian Siegel <molybdaen@mr42.org>
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+- name: "Import sources list configuration tasks ..."
+  ansible.builtin.import: "sources.yml"
+  tags:
+    - opensearch
+    - opensearch-sources
+
+- name: "Import install tasks ..."
+  ansible.builtin.import: "install.yml"
+  tags:
+    - opensearch
+    - opensearch-install
+
+- name: "Import OpenSearch configuration tasks ..."
+  ansible.builtin.import: "configure.yml"
+  tags:
+    - opensearch
+    - opensearch-config
+
+- name: "Import OpenSearch user configuration ..."
+  ansible.builtin.import: "users.yyml"
+  tags:
+    - opensearch
+    - opensearch-users
+
+

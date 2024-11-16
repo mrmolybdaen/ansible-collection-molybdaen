@@ -1,0 +1,41 @@
+---
+
+# Copyright: (c) 2024, Christian Siegel <molybdaen@mr42.org>
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+- name: "sources | Install prerequisities ..."
+  ansible.builtin.apt:
+    state: present
+    name:
+      - gnupg2
+      - ca-certificates
+      - curl
+  become: true
+  tags:
+    - opensearch
+    - opensearch-sources
+    - opensearch-sources-apt
+
+- name: "sources | Get and install repository key ..."
+  ansible.builtin.deb822_repository:
+    name: "opensearch"
+    types: deb
+    suites: stable
+    components: main
+    uris: "https://artifacts.opensearch.org/releases/bundle/opensearch/2.x/apt"
+    signed_by: "https://artifacts.opensearch.org/publickeys/opensearch.pgp"
+  tags:
+    - opensearch
+    - opensearch-sources
+    - opensearch-sources-list
+
+- name: "sources | Update repository cache ..."
+  ansible.builtin.apt:
+    update_cache: true
+  become: true
+  tags:
+    - opensearch
+    - opensearch-sources
+    - opensearch-sources-list
+    - opensearch-sources-key
+
