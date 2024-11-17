@@ -1,0 +1,125 @@
+#!/usr/sbin/nft -f
+
+flush ruleset
+
+# Include general definitions like ports and other stuff
+include "/etc/nftables.d/defines.nft"
+
+table inet firewall {
+
+    # Include maps, like verdict maps and others so each
+    # service can provide its own acl.
+    include "/etc/nftables.d/*.map"
+    # Include sets of addresses
+    include "/etc/nftables.d/*.set"
+    # Include custom chains
+    include "/etc/nftables.d/*.chain"
+
+    chain inbound_ipv4 {
+        # Configure IPv4 loopback traffic
+        ip saddr 127.0.0.0/8 counter packets 0 bytes 0 drop;
+
+        # accepting ping (icmp-echo-request) for diagnostic purposes.
+        # However, it also lets probes discover this host is alive.
+        # This sample accepts them within a certain rate limit:
+        #
+        icmp type echo-request limit rate 2/second accept
+
+        # Include application specific general rules from files in /etc/nftables.d/*-ipv4.in-app
+        include "/etc/nftables.d/*-ipv4.in-app"
+    }
+
+    # We are using IPv6 only on the public interfaces.
+    # This is why we only have one chain.
+    chain inbound_ipv6 {
+        # Ensure IPv6 loopback traffic is configured
+        ip6 saddr ::1 counter packets 0 bytes 0 drop;
+
+        # accept neighbour discovery otherwise connectivity breaks
+        #
+        icmpv6 type { nd-neighbor-solicit, nd-router-advert, nd-neighbor-advert } accept;
+
+        # accepting ping (icmpv6-echo-request) for diagnostic purposes.
+        # However, it also lets probes discover this host is alive.
+        # This sample accepts them within a certain rate limit:
+        #
+        icmpv6 type echo-request limit rate 2/second accept
+
+        # Include application specific general rules from files in /etc/nftables.d/*-ipv6.in-app
+        include "/etc/nftables.d/*-ipv6.in-app"
+    }
+
+    chain inbound {
+
+        # By default, drop all traffic unless it meets a filter
+        # criteria specified by the rules that follow below.
+        type filter hook input priority 0; policy drop;
+
+        # Allow traffic from established and related packets, drop invalid
+        ct state vmap { established : accept, related : accept, invalid : drop }
+
+        # Allow loopback traffic.
+        iifname lo accept
+
+        # Ensure established connections are configured
+        ip protocol tcp ct state established accept
+        ip protocol udp ct state established accept
+        ip protocol icmp ct state established accept
+
+        # Jump to chain according to layer 3 protocol using a verdict map
+        meta protocol vmap { ip : jump inbound_ipv4, ip6 : jump inbound_ipv6 }
+
+        # Uncomment to enable logging of denied inbound traffic
+        log prefix "[nftables denied] Inbound: " counter drop
+    }
+
+    chain forward {
+        # Drop everything (assumes this device is not a router)
+        type filter hook forward priority 0; policy drop;
+
+        # Allow traffic from established and related packets, drop invalid
+        ct state vmap { established : accept, related : accept, invalid : drop }
+
+        # accepting ping (icmp-echo-request) for diagnostic purposes.
+        icmp type echo-request limit rate 2/second accept
+        icmpv6 type echo-request limit rate 2/second accept
+
+        include "/etc/nftables.d/*.fwd-app"
+
+        # Uncomment to enable logging of denied outbound traffic
+        log prefix "[nftables denied] Forward: " counter drop
+    }
+
+    chain output {
+        # no need to define output chain, default policy is accept if undefined.
+        type filter hook output priority 0; policy accept;
+
+        # Ensure outbound an established connections are configured
+        ip protocol tcp ct state established,related,new accept
+        ip protocol udp ct state established,related,new accept
+        ip protocol icmp ct state established,related,new accept
+
+        include "/etc/nftables.d/*.out-app"
+
+        # Uncomment to enable logging of denied outbound traffic
+        log prefix "[nftables denied] Outbound: " counter drop
+    }
+
+{% if nftables_masquerade is defined %}
+    chain postrouting {
+        type nat hook postrouting priority 100; policy accept;
+
+        # masquerade private IP addresses
+{% if nftables_masquerade.ipv4 is defined %}
+        # Masquerade IPv4 addresses defined in set masquerade-source-ipv4
+        # from /etc/nftables.d/97-masquerade.set
+        ip saddr @masquerade-source-ipv4 oifname $IF_PUBLIC masquerade
+{% endif %}
+{% if nftables_masquerade.ipv6 is defined %}
+        # Masquerade IPv6 addresses defined in set masquerade-source-ipv6
+        # defined in /etc/nftables.d/97-masquerade.set
+        ip saddr @masquerade-source-ipv6 oifname $IF_PUBLIC masquerade
+{% endif %}
+    }
+{% endif %}
+}

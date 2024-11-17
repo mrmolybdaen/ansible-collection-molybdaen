@@ -5,8 +5,34 @@
 
 argument_specs:
   main:
-    short_description:
+    short_description: This role does basic configuration fpr nftables
     description:
+      - "This role provides basic configuration for nftables."
+      - "It creates a directory C(/etc/nftables.d) to put all configuration in."
+      - "It rewrites the default C(/etc/nftables.conf) to include the directory."
+      - "We recommend a naming convention for nftables configuration files C(/etc/nftables.d)"
+      - "Use C(*.chain) for chain files."
+      - "Use C(*.set) for set files."
+      - "Use C(*.map) for map files."
+      - "Use C(-ipv4.in-app) for inbound ipv4 app traffic"
+      - "Use C(-ipv6.in-app) for inbound ipv6 app traffic"
+      - "Use C(*.fwd-app) for forwarding traffic"
     author: Christian Siegel
     options:
-
+      nftables_masquerade:
+        type: "dict"
+        elements:
+          ipv4:
+            type: "list"
+            elements: "str"
+            required: false
+            description:
+              - "List of typically private IPv4 addresses and address ranges"
+          ipv6:
+            type: "list"
+            elements: "str"
+            required: false
+            description:
+              - "List of IPv6 addresses which should stay private when routing"
+        description:
+          - "Dictionary of lists of IPv4 and IPv6 addresses to masquerade when routing"

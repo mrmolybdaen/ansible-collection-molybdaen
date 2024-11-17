@@ -4,3 +4,14 @@
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 
+# Update nftables
+- name: "Show current active firewall ruleset"
+  ansible.builtin.command: "nft list ruleset"
+  register: nftables_nft_list
+  changed_when: nftables_nft_list.rc == 0
+  failed_when: nftables_nft_list.rc != 0
+  listen: handlers_nftables_nft_list_ruleset
+  become: true
+  tags:
+    - always
+

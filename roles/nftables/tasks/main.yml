@@ -1,0 +1,17 @@
+---
+
+# Copyright: (c) 2024, Christian Siegel <molybdaen@mr42.org>
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+
+- name: "Do the firewall stuff ..."
+  when: nftables_configure is defined and not nftables_configure
+  block:
+    - name: "Import configuration ..."
+      ansible.builtin.import_tasks: "configure.yml"
+
+    - name: "Restart nftables ..."
+      ansible.builtin.systemd:
+        name: nftables.service
+        state: restarted
+      become: true
