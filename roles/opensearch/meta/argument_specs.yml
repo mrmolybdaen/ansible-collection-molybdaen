@@ -11,5 +11,5 @@ argument_specs:
       - Configure OpenSearch with admin user, management user and log index user
       - By default configure single node mode.
     author: Christian Siegel
-    options:
+    #options:
 

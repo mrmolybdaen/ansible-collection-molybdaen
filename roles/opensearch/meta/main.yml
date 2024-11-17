@@ -10,7 +10,4 @@ allow_duplicates: false
 dependencies:
   # Do not expose OpenSearch directly to the web but hide it behind Nginx.
   # This will make use of Nginx host allow/deny mechanisms
-  - role: nginx
-    vars:
-
-
+  - role: nftables
