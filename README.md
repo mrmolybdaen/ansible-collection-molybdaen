@@ -15,8 +15,17 @@ Security is oriented on CIS benchmarks where available and is mostly optimized f
 > **WARNING:**
 > This role makes use of external repositories for MariaDB (from MariaDB maintainers), Apach2 and PHP (deb.sury.org) as
 > well as Nginx (nginx repos) and ISC BIND9 to provide all security relevant patches as well as feature updates.
-> This can be disabled via `maintainer_repositories: false`. If you do not define this variable it is set to `true`.
+> This can be disabled via `maintainer_repositories: false`. If you do not define this variable it is handled as `true`.
 
 Some roles focus on basic configuration and hardening which is not configurable.
 Where possible we use, aside of apparmor, Systemd unit overrides to secure processes. This adds another layer of security
 because Systemd will start processes which already have limited capabilities.
+
+> **NOTE**:
+> All roles providing networking services depend on the `nftables` role so no extra firewall frontend is needed.
+> Any service providing networking services (such as Nginx, Apache2 or OpenSearch) will provide its own ruleset.
+
+## Dependencies
+
+This role depends on several different Python libraries.
+- netaddr
