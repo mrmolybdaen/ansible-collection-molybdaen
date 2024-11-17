@@ -4,7 +4,7 @@ destemail          = root@localhost
 banaction          = nftables
 banaction_allports = nftables[type=allports]
 
-ignoreip           = {{ fail2ban_whitelist }}
+ignoreip           = {% for ip in fail2ban_whitelist %}{{ ip }}{{ " " if not loop.last else "" }}{% endfor %}
 maxretry           = 3
 bantime            = 1h
 bantime.increment  = true
