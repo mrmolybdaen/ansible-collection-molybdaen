@@ -2,7 +2,7 @@
 
 This collection is a result of my work. It aims to standardize deployments of Debian based web servers, mostly LAMP stacks.
 
-The aim of this collection is to move from Infrastructure as Code (IaC) to a Configuration as Code model as well.
+The aim of this collection is to move from Infrastructure as Code (IaC) to a Configuration as Code like model as well.
 This means host variables can be used to create YAML based configuration which will get translated via Jinja2 templates
 into the actual configuration format.
 
