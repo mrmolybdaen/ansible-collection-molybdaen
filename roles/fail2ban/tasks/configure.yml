@@ -1,0 +1,64 @@
+---
+
+# Copyright: (c) 2024, Christian Siegel <molybdaen@mr42.org>
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+
+- name: "configure | Configure fail2ban via jail.conf"
+  ansible.builtin.template:
+    src: "etc/fail2ban/jail.conf.j2"
+    dest: "/etc/fail2ban/jail.conf"
+    owner: root
+    group: root
+    mode: '0600'
+  notify: handlers_fail2ban_systemd_unit_restart
+  become: true
+  tags:
+    - fail2ban
+    - fail2ban-configure
+    - fail2ban-configure-base
+
+- name: "configure | Show active roles"
+  ansible.builtin.debug:
+    msg: "Active roles: {{ ansible_play_role_names }}"
+
+- name: "configure | Configure fail2ban"
+  ansible.builtin.template:
+    src: "etc/fail2ban/jail.local.j2"
+    dest: "/etc/fail2ban/jail.local"
+    owner: root
+    group: root
+    mode: '0600'
+  notify: handlers_fail2ban_systemd_unit_restart
+  become: true
+  tags:
+    - fail2ban
+    - fail2ban-configure
+    - fail2ban-configure-base
+
+- name: "configure | Configure fail2ban via fail2ban.local"
+  ansible.builtin.template:
+    src: "etc/fail2ban/fail2ban.local.j2"
+    dest: "/etc/fail2ban/fail2ban.local"
+    owner: root
+    group: root
+    mode: '0600'
+  notify: handlers_fail2ban_systemd_unit_restart
+  become: true
+  tags:
+    - fail2ban
+    - fail2ban-configure
+    - fail2ban-configure-base
+
+- name: "configure | Create log directory ..."
+  ansible.builtin.file:
+    state: directory
+    path: "/var/log/fail2ban"
+    owner: root
+    group: adm
+    mode: "0750"
+  become: true
+  tags:
+    - fail2ban
+    - fail2ban-configure
+    - fail2ban-configure-base

@@ -1,0 +1,17 @@
+---
+
+# Copyright: (c) 2024, Christian Siegel <molybdaen@mr42.org>
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+
+- name: "logrotation | Configure logrotation"
+  ansible.builtin.copy:
+    src: "etc/logrotate.d/fail2ban"
+    dest: "/etc/logrotate.d/fail2ban"
+    mode: '0644'
+    owner: root
+    group: root
+  become: true
+  tags:
+    - nftables
+    - nftables-logs

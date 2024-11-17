@@ -1,0 +1,150 @@
+[DEFAULT]
+destemail          = root@localhost
+
+banaction          = nftables
+banaction_allports = nftables[type=allports]
+
+ignoreip           = {{ fail2ban_whitelist }}
+maxretry           = 3
+bantime            = 1h
+bantime.increment  = true
+bantime.factor     = 1
+bantime.formula    = ban.Time * (1<<(ban.Count if ban.Count<20 else 20)) * banFactor
+bantime.maxtime    = 1w
+bantime.rndtime    = 600
+
+backend = systemd
+usedns = warn
+
+[sshd]
+enabled	= true
+port    = ssh
+filter	= sshd
+
+{% if 'apache2' in ansible_play_role_names %}
+# Detect password authentication failures
+[apache]
+enabled  = true
+port     = http,https
+filter   = apache-auth
+logpath  = /var/log/apache2/*error.log
+backend  = polling
+journalmatch =
+maxretry = 4
+
+# Detect Apache ModSec
+[apache-modsecurity]
+enabled  = true
+port     = http,https
+filter   = apache-modsecurity
+logpath  = /var/log/apache2/*error.log
+maxretry = 15
+backend  = polling
+journalmatch =
+
+# Detect Apache no home activities attempts
+[apache-nohome]
+enabled  = true
+port     = http,https
+filter   = apache-nohome
+logpath  = /var/log/apache2/*error.log
+maxretry = 5
+backend  = polling
+journalmatch =
+
+# Detect potential search for exploits and php vulnerabilities
+[apache-noscript]
+enabled  = true
+port     = http,https
+filter   = apache-noscript
+logpath  = /var/log/apache2/*error.log
+maxretry = 8
+backend  = polling
+journalmatch =
+
+# Detect Apache overflow attempts
+[apache-overflows]
+enabled  = true
+port     = http,https
+filter   = apache-overflows
+logpath  = /var/log/apache2/*error.log
+maxretry = 2
+backend  = polling
+journalmatch =
+
+# Detect Apache shellshock attempts
+[apache-shellshock]
+enabled  = true
+port     = http,https
+filter   = apache-shellshock
+logpath  = /var/log/apache2/*error.log
+maxretry = 2
+backend  = polling
+journalmatch =
+{% endif %}
+
+{%if 'nginx' in ansible_play_role_names %}
+# Detect Nginx bad requests
+[nginx-bad-request]
+enabled  = true
+port     = http,https
+filter   = nginx-bad-request
+logpath  = /var/log/nginx/*error.log
+maxretry = 8
+backend  = polling
+journalmatch =
+
+# Filters requests to files which do not exist
+[nginx-botsearch]
+enabled  = true
+port     = http,https
+filter   = nginx-botsearch
+logpath  = /var/log/nginx/*error.log
+maxretry = 25
+backend  = polling
+journalmatch =
+
+# detect password authentication failures
+[nginx-http-auth]
+enabled  = true
+port     = http,https
+filter   = nginx-http-auth
+logpath  = /var/log/nginx/*error.log
+maxretry = 4
+backend  = polling
+journalmatch =
+
+# Ban hosts which got caught by Nginx request limiting feature
+[nginx-limit-req]
+enabled  = true
+port     = http,https
+filter   = nginx-limit-req
+logpath  = /var/log/nginx/*error.log
+maxretry = 5
+backend  = polling
+journalmatch =
+{% endif %}
+
+{%if 'gitlab' in ansible_play_role_names %}
+# Detect gitlab failed logins
+[gitlab-logins-failed]
+enabled  = true
+port     = http,https
+filter   = gitlab
+logpath  = /var/log/gitlab/gitlab-rails/application.log
+maxretry = 8
+backend  = polling
+journalmatch =
+{% endif %}
+
+{% if 'haproxy' in ansible_play_role_names %}
+# Detect failed Basic Authentication logins on HAProxy
+[haproxy-basicauth]
+enabled  = true
+port     = http,https
+filter   = haproxy-http-auth
+logpath  = /var/log/haproxy/haproxy.log
+maxretry = 8
+backend  = polling
+journalmatch = SYSLOG_IDENTIFIER=haproxy
+{% endif %}
