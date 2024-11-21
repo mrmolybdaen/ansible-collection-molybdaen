@@ -1,0 +1,26 @@
+---
+
+- name: "Install ssh client/server"
+  ansible.builtin.import_tasks: install.yml
+  tags:
+    - sshd
+    - sshd-install
+
+- name: "Configure the ssh daemon"
+  ansible.builtin.import_tasks: configure.yml
+  tags:
+    - sshd
+    - sshd-config
+
+- name: "Start the ssh daemon service"
+  ansible.builtin.import_tasks: systemd.yml
+  tags:
+    - sshd
+    - sshd-systemd
+
+- name: "Configure firewall rule for SSH with nftables"
+  when: "not ('ufw' in ansible_play_role_names or 'firewalld' in ansible_play_role_names)"
+  ansible.builtin.import_tasks: nftables.yml
+  tags:
+    - sshd
+    - sshd-firewall

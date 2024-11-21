@@ -1,0 +1,243 @@
+---
+
+# Copyright: (c) 2024, Christian Siegel <molybdaen@mr42.org>
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+argument_specs:
+  main:
+    short_description: "Configure the SSH daemon"
+    description:
+      - "Configure ssh and its services."
+      - "Configure firewall rules for ssh"
+      - "This role depends on C('nftables')"
+      - "View the OpenSSH daemon manual page for more information using C(man openssh_config)"
+    author: Christian Siegel
+    options:
+      openssh_addresses:
+        type: "list"
+        required: false
+        description:
+          - "It sets the C(ListenAddress) parameter."
+          - "List of addresses OpenSSH binds to."
+          - "Make sure the list entries match C(openssh_addr_family)".
+          - "This does not have a default. But if not set, it defaults to all addresses depending on C(openssh_addr_family)"
+          - "If C(openssh_addr_family) is not set or C('any') OpenSSH will bind to C(::1) and C(0.0.0.0)"
+          - "If C(openssh_addr_family) is set to C('inet') this will default to C(0.0.0.0)."
+          - "If C(openssh_addr_family) is set to C('inet6') this will default C(::1)."
+      openssh_addr_family:
+        type: "str"
+        required: false
+        description:
+          - "This sets OpenSSH the C(AddressFamily) configuration parameter."
+          - "In C('/etc/ssh/openssh_config') this defaults to any if not defined."
+        choices:
+          - "any"
+          - "inet"
+          - "inet6"
+      openssh_authmethod:
+        type: "str"
+        required: false
+        description:
+          - "This sets the C(AuthenticationMethods) configuration parameter."
+          - "This takes only one method."
+          - "If not defined C('publickey') will be used."
+        choices:
+          - "gssapi-with-mic"
+          - "hostbased"
+          - "keyboard-interactive"
+          - "none"
+          - "password"
+          - "publickey"
+      openssh_banner_content:
+        type: "str"
+        required: false
+        description:
+          - "Optional text for OpenSSH banner."
+          - "This variable will be used in C('openssh_config.d/ssh.banner')"
+      openssh_banner_path:
+        type: "str"
+        required: false
+        description:
+          - "This sets the C(Banner) configuration parameter."
+          - "This is either C('none') or a path to a banner file."
+          - "If set and not C('none') will create a file C('openssh_config.d/ssh.banner')"
+          - "A banner will be send to a client before authentication!"
+      openssh_challenge_response:
+        type: "str"
+        required: false
+        description:
+      openssh_chrootdir:
+        type: "str"
+        required: false
+        description:
+      openssh_clientalive_countmax:
+        type: "int"
+        required: false
+        description:
+      openssh_clientalive_interval:
+        type: "int"
+        required: false
+        description:
+      openssh_compression:
+        type: "str"
+        required: false
+        choices:
+          - "yes"
+          - "no"
+        description:
+          - "Sets C(Compression) configuration parameter"
+          - "After authentication is done, OpenSSH can use compression to free up some bandwidth."
+          - "Set to C('yes') this might create warnings during audits with CIS or Lynis. However, this is not a problem in modern OpenSSH."
+          - "Defaults to C('yes')."
+      openssh_empty_passwords:
+        type: "str"
+        required: false
+        description:
+          - "Sets C(PermitEmptyPasswords) configuration parameter"
+        choices:
+          - "yes"
+          - "no"
+      openssh_forward_agent:
+        type: "str"
+        required: false
+        choices:
+          - "yes"
+          - "no"
+        description:
+          - "Sets C(AllowAgentForwarding) configuration parameter"
+          - "Defaults to C('no')."
+      openssh_forward_tcp:
+        type: "str"
+        required: false
+        choices:
+          - "yes"
+          - "no"
+        description:
+          - "Sets C(AllowTcpForwarding) configuration parameter"
+          - "Defaults to C('no')."
+      openssh_forward_x11:
+        type: "str"
+        required: false
+        description:
+          - "Sets C(AllowX11Fowarding) configuration parameter"
+          - "Defaults to C('no')."
+      openssh_gatewayports:
+        type: "str"
+        required: false
+        choices:
+          - "yes"
+          - "no"
+        description:
+      openssh_gssapi:
+        type: "str"
+        required: false
+        choices:
+          - "yes"
+          - "no"
+        description:
+      openssh_ignore_rhosts:
+        type: "str"
+        required: false
+        choices:
+          - "yes"
+          - "no"
+        description:
+      openssh_ignore_user_knownhosts:
+        type: "str"
+        required: false
+        choices:
+          - "yes"
+          - "no"
+        description:
+      openssh_kerberos:
+        type: "str"
+        required: false
+        choices:
+          - "yes"
+          - "no"
+        description:
+      openssh_key_types:
+      openssh_login_gracetime:
+      openssh_maxauthtries:
+      openssh_maxsessions:
+      openssh_maxstartups:
+      openssh_maxstartiups_persource:
+      openssh_motd:
+        type: "str"
+        required: false
+        choices:
+          - "yes"
+          - "no"
+        description:
+      openssh_passwordauthentication:
+        type: "str"
+        required: false
+        choices:
+          - "yes"
+          - "no"
+        description:
+      openssh_permittunnel:
+        type: "str"
+        required: false
+        choices:
+          - "yes"
+          - "no"
+        description:
+      openssh_permituserrc:
+        type: "str"
+        required: false
+        choices:
+          - "yes"
+          - "no"
+        description:
+      openssh_pidfile:
+      openssh_port:
+        type: "str"
+        default: "$PORT_STANDARD_SSH"
+        required: false
+        description:
+          - "SSH Port"
+          - "This should take numeric values except for C('$PORT_STANDARD_SSH') which is defined in nftables"
+          - "You SHOULD define this if you do not use the collection's role C(nftables)!"
+      openssh_print_lastlog:
+        type: "str"
+        required: false
+        choices:
+          - "yes"
+          - "no"
+        description:
+      openssh_pubkeyauthentication:
+        type: "str"
+        required: false
+        choices:
+          - "yes"
+          - "no"
+        description:
+      openssh_rekey_limit:
+      openssh_rsa_minsize:
+      openssh_subsystem_sftp:
+      openssh_tcp_keepalive:
+      openssh_usedns:
+      openssh_usepam:
+      openssh_userenv:
+      openssh_users:
+        type: "list"
+        required: false
+        description:
+          - "Sets the C(AllowUsers) configuration parameter."
+          - "If unset, will create a configuration entry for it"
+      openssh_versionaddendum:
+      openssh_whitelist_ipv4:
+        type: "list"
+        elements: "str"
+        default: []
+        required: true
+        description:
+          - "List of IPv4 addresses"
+      openssh_whitelist_ipv6:
+        type: "list"
+        elements: "str"
+        default: []
+        required: true
+        description:
+          - "List of IPv6 addresses"

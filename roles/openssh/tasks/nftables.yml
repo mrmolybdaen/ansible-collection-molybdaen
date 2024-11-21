@@ -1,0 +1,124 @@
+---
+
+- name: "nftables | Check if fallback file exists ..."
+  ansible.builtin.stat:
+    path: "/etc/nftables.d/99-sshd-fallback.in-app"
+  register: openssh_fallback_exists
+  tags:
+    - sshd
+    - sshd-nftables
+    - nftables
+
+- name: "nftables | Cleanup sshd fallback file ..."
+  when: openssh_fallback_exists.stat.exists
+  tags:
+    - sshd
+    - sshd-nftables
+    - nftables
+  block:
+    - name: "nftables | Get IP address of current session"
+      ansible.builtin.shell:
+        cmd: |
+          set -o pipefail
+          who -m --ips | grep {{ ansible_user }} | awk '{ print $5}'
+      args:
+        executable: /bin/bash
+      register: nftables_deployment_source
+      changed_when: nftables_deployment_source.rc == 0
+      become: false
+
+    - name: "nftables | Set cleanup variable"
+      when: item | ansible.utils.network_in_network( nftables_deployment_source.stdout )
+      ansible.builtin.set_fact:
+        openssh_nftables_cleanup: true
+      loop: "{{ openssh_allowed_ips }}"
+
+    - name: "nftables | Cleanup message success ..."
+      when: openssh_nftables_cleanup is defined and openssh_nftables_cleanup
+      ansible.builtin.debug:
+        msg: "Fallback file can be cleaned up."
+
+    - name: "nftables | Cleanup message fail ..."
+      when: openssh_nftables_cleanup is not defined
+      ansible.builtin.debug:
+        msg: "WARNING: Fallback file cannot be removed."
+
+    - name: "nftables | Cleanup ..."
+      when: openssh_nftables_cleanup is defined and openssh_nftables_cleanup
+      ansible.builtin.file:
+        path: "/etc/nftables.d/99-sshd-fallback.in-app"
+        state: absent
+      become: true
+
+- name: "nftables | Add SSH rule"
+  ansible.builtin.template:
+    src: "etc/nftables.d/99-sshd-ipv4.in-app.j2"
+    dest: "/etc/nftables.d/99-sshd-ipv4.in-app"
+    mode: "0640"
+    owner: root
+    group: root
+    backup: true
+  register: openssh_nftables_config_ipv4
+  become: true
+  tags:
+    - sshd
+    - sshd-nftables
+
+- name: "nftables | Add SSH rule"
+  ansible.builtin.template:
+    src: "etc/nftables.d/99-sshd-ipv6.in-app.j2"
+    dest: "/etc/nftables.d/99-sshd-ipv6.in-app"
+    mode: "0640"
+    owner: root
+    group: root
+    backup: true
+  register: openssh_nftables_config_ipv6
+  become: true
+  tags:
+    - sshd
+    - sshd-nftables
+
+- name: "nftables | Add whitelists ..."
+  ansible.builtin.template:
+    src: etc/nftables.d/97-sshd.set.j2
+    dest: /etc/nftables.d/97-sshd.set.j2
+    owner: root
+    group: root
+    mode: "0644"
+  register: openssh_nftables_config_sets
+  become: true
+  tags:
+    - sshd
+    - sshd-nftables
+
+- name: "nftables | Check configuration, rollback on error ..."
+  tags:
+    - sshd
+    - sshd-nftables
+  block:
+    - name: "nftables | Check configuration ..."
+      ansible.builtin.command: /usr/sbin/nft -c -f /etc/nftables.conf
+      register: nftables_check_cfg
+      changed_when: nftables_check_cfg.rc == 0
+      become: true
+
+  rescue:
+    - name: "nftables | Do a configuration rollback ..."
+      when: openssh_nftables_config.backup_file is defined
+      ansible.builtin.copy:
+        remote_src: true
+        src: "{{ openssh_nftables_config.backup_file }}"
+        dest: "{{ openssh_nftables_config.dest }}"
+        mode: "0640"
+        owner: root
+        group: root
+      become: true
+
+- name: "nftables | Restart nftables ..."
+  ansible.builtin.systemd_service:
+    state: restarted
+    name: nftables.service
+  become: true
+  tags:
+    - sshd
+    - sshd-nftables

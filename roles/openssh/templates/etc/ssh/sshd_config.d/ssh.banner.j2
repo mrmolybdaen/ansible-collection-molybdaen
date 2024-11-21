@@ -1,0 +1,11 @@
+{% if openssh_banner_content is defined and openssh_banner_content|length %}
+{{ openssh_banner_content }}
+{% else %}
+{# This text needs some work on. By default, this file will not be created. #}
+You are entering a restricted area. Authorized users only. Any connection attempt, successful or not, will be logged.
+This includes information about the user you are trying to connect to, the referring public key
+fingerprint and the public internet protocol address of the device You are connecting from.
+Successful connections lead to logging of security relevant activity such as using sudo and trying
+to alter files not owned by the user.
+By connecting to this system You agree with this situation. If not, log off immediately.
+{% endif %}

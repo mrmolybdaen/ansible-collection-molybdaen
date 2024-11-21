@@ -1,0 +1,12 @@
+---
+
+- name: "install | Install ssh"
+  ansible.builtin.package:
+    name:
+      - openssh-client
+      - openssh-server
+    state: present
+  become: true
+  tags:
+    - sshd
+    - sshd-install

@@ -1,0 +1,167 @@
+# This is the sshd server system-wide configuration file.  See
+# sshd_config(5) for more information.
+
+# This sshd was compiled with PATH=/usr/bin:/bin:/usr/sbin:/sbin
+
+# The strategy used for options in the default sshd_config shipped with
+# OpenSSH is to specify options with their default value where
+# possible, but leave them commented.  Uncommented options override the
+# default value.
+
+# Include config directory
+# Make all user and application specific configurations here!
+Include /etc/ssh/sshd_config.d/*.conf
+
+{% if "$PORT_STANDARD_SSH" == openssh_port %}
+Port 22
+{% else %}
+Port {{ openssh_port }}
+{% endif %}
+AddressFamily {{ openssh_addr_family | default('any') }}
+{% if openssh_addr_family in ['any', 'inet'] %}
+{% if openssh_addresses_ipv4 is defined and openssh_addresses_ipv4|length %}
+{% for ip in openssh_addresses_ipv4%}
+ListenAddress {{ ip }}
+{% else %}
+ListenAddress 0.0.0.0
+{% endif %}
+{% if openssh_addr_family in ['any', 'inet6'] %}
+{% if openssh_addresses_ipv6 is defined and openssh_addresses_ipv6|length %}
+{% for ip in openssh_addresses_ipv6%}
+ListenAddress {{ ip }}
+{% else %}
+ListenAddress ::1
+{% endif %}
+Protocol 2
+
+# Host key configuration
+HostKey /etc/ssh/ssh_host_rsa_key
+HostKey /etc/ssh/ssh_host_ed25519_key
+# Only accept ED25519 and RSA, no DSS or ECDSA
+PubkeyAcceptedKeyTypes {{ openssh_key_types | default("ssh-ed25519,ssh-ed25519-cert-v01@openssh.com,sk-ssh-ed25519@openssh.com,sk-ssh-ed25519-cert-v01@openssh.com,ssh-rsa,ssh-rsa-cert-v01@openssh.com") }}
+
+# Set available algorithms
+KexAlgorithms curve25519-sha256@libssh.org,diffie-hellman-group-exchange-sha256
+# Set available ciphers
+Ciphers chacha20-poly1305@openssh.com,aes256-gcm@openssh.com,aes128-gcm@openssh.com,aes256-ctr,aes192-ctr,aes128-ctr
+# Set available MACs
+MACs hmac-sha2-512-etm@openssh.com,hmac-sha2-256-etm@openssh.com,hmac-sha2-512,hmac-sha2-256
+
+# Ciphers and keying
+# While taking the default amount of
+# transferred data (1-4g depending on cipher)
+# do also always rekey after 600 seconds
+RekeyLimit default {{ openssh_reykey_limit | default(600) }}
+
+# Set RSA key minimal length
+RequiredRSASize {{ openssh_rsa_minsize | default(4096) }}
+
+# Logging
+SyslogFacility AUTH
+LogLevel VERBOSE
+
+# Authentication:
+
+# Disconnect after 10s if authentication
+# does not succeed
+LoginGraceTime {{ openssh_login_gracetime | default(30) }}
+
+# Disable root login, it is bad practice. We do not allow to override it
+PermitRootLogin no
+# Specifies whether sshd(8) should check file modes and
+# ownership of the user's files and home directory before
+# accepting login
+StrictModes yes
+
+# Max ssh sessions and login attempts
+MaxAuthTries {{ openssh_maxauthtries | default(3) }}
+MaxSessions {{ openssh_maxsessions | default(10) }}
+# Specifies number of concurrent unauthenticated sessions
+# start:rate:full
+MaxStartups {{ openssh_maxstartups | default("25:50:60") }}
+PerSourceMaxStartups {{ openssh_maxstartups_persource | default(6) }}
+
+# Specifying authentication methods
+AuthenticationMethods {{ openssh_authmethod | default("publickey") }}
+PubkeyAuthentication {{ openssh_pubkeyauthentication | default("yes") }}
+PasswordAuthentication {{ openssh_passwordauthentication | default("no") }}
+
+# Expect .ssh/authorized_keys2 to be disregarded by default in future.
+# Set general key file names to check for
+AuthorizedKeysFile .ssh/authorized_keys
+
+#AuthorizedPrincipalsFile none
+
+#AuthorizedKeysCommand none
+#AuthorizedKeysCommandUser nobody
+
+# For this to work you will also need host keys in /etc/ssh/ssh_known_hosts
+HostbasedAuthentication no
+# Change to yes if you don't trust ~/.ssh/known_hosts for
+# HostbasedAuthentication
+IgnoreUserKnownHosts {{ openssh_ignore_user_knownhosts | default("no") }}
+# Don't read the user's ~/.rhosts and ~/.shosts files
+IgnoreRhosts {{ openssh_ignore_rhosts | default("yes") }}
+
+# To disable tunneled clear text passwords, change to no here!
+PermitEmptyPasswords {{ openssh_empty_passwords | default("no") }}
+# Disables setting of ENV variables through SSH
+PermitUserEnvironment {{ openssh_userenv | default("no") }}
+
+# Change to yes to enable challenge-response passwords (beware issues with
+# some PAM modules and threads)
+ChallengeResponseAuthentication {{ openssh_challenge_response | default("no") }}
+
+# Kerberos options
+KerberosAuthentication {{ openssh_kerberos | default("no") }}
+
+# GSSAPI options
+GSSAPIAuthentication {{ openssh_gssapi | default("no") }}
+
+# Set this to 'yes' to enable PAM authentication, account processing,
+# and session processing. If this is enabled, PAM authentication will
+# be allowed through the ChallengeResponseAuthentication and
+# PasswordAuthentication.  Depending on your PAM configuration,
+# PAM authentication via ChallengeResponseAuthentication may bypass
+# the setting of "PermitRootLogin without-password".
+# If you just want the PAM account and session checks to run without
+# PAM authentication, then enable this but set PasswordAuthentication
+# and ChallengeResponseAuthentication to 'no'.
+UsePAM {{ openssh_usepam | default("yes") }}
+
+{% if openssh_users is defined and openssh_users|length %}
+# Allow only specific users to use ssh for login
+AllowUsers {% for user in openssh_users %}{{ user }}{{ " " if not loop.last else "" }}{% endfor -%}
+{% endif %}
+
+AllowTcpForwarding {{ openssh_forward_tcp | default("no") }}
+AllowAgentForwarding {{ openssh_forward_agent | default("no") }}
+X11Forwarding {{ openssh_forward_x11 | default("no") }}
+GatewayPorts {{ openssh_gatewayports | default("no") }}
+
+PrintMotd {{ openssh_motd | default("yes") }}
+PrintLastLog {{ openssh_print_lastlog | default("yes") }}
+TCPKeepAlive {{ openssh_tcp_keepalive | default("yes") }}
+PermitUserRC {{ openssh_permituserrc | default("no") }}
+# OpenSSH compresses AFTER authentication.
+# Any recommendation to disable this setting is based on a
+# deprecated OpenSSH older than 2005 and does not make sense in 2020s
+Compression {{ openssh_compression | default("yes") }}
+ClientAliveInterval {{ openssh_clientalive_interval | default(60) }}
+ClientAliveCountMax {{ openssh_clientalive_countmax | default(10) }}
+UseDNS {{ openssh_usedns | default("no") }}
+PidFile {{ openssh_pidfile | default("/run/sshd.pid") }}
+PermitTunnel {{ openssh_permittunnel | default("no") }}
+ChrootDirectory {{ openssh_chrootdir | default("none") }}
+#VersionAddendum {{ openssh_versionaddendum | default("none") }}
+
+# no default banner pathclient
+Banner {{ openssh_banner_path | default("none") }}
+
+# Allow client to pass locale environment variables
+AcceptEnv LANG LC_*
+
+# override default of no subsystems
+{% if openssh_subsystem_sftp is defined and openssh_subsystem_sftp -%}
+Subsystem sftp /usr/lib/openssh/sftp-server -f AUTHPRIV -l INFO
+{% endif %}

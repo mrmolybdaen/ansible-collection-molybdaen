@@ -27,5 +27,12 @@ because Systemd will start processes which already have limited capabilities.
 
 ## Dependencies
 
-This role depends on several different Python libraries.
+This role depends on several different Python libraries which do not come with the `ansible` or `ansible-core` packages.
 - netaddr
+
+## Default values
+
+For most variables defined in roles we use defaults. Those defaults are defined where they are used.
+You will find them in templates and task files next to the variable.
+Unfortunately this means one can not rely on these variable values when they are not defined by the user.
+However, templates are a lot more readable doing this. 
