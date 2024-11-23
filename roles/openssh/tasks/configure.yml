@@ -7,10 +7,10 @@
     - sshd
     - sshd-config
   block:
-    - name: "configure | Create longer RSA host key"
+    - name: "configure | Create RSA host key with two times the length of openssh_rsa_minsize"
       community.crypto.openssh_keypair:
         type: "rsa"
-        size: 8192
+        size: "{{ openssh_rsa_minsize|int * 2 }}"
         path: "/etc/ssh/ssh_host_rsa_key"
         comment: "root@{{ ansible_facts['hostname'] }}"
         regenerate: "partial_idempotence"
