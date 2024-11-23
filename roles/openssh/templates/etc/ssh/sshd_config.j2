@@ -22,15 +22,19 @@ AddressFamily {{ openssh_addr_family | default('any') }}
 {% if openssh_addresses_ipv4 is defined and openssh_addresses_ipv4|length %}
 {% for ip in openssh_addresses_ipv4%}
 ListenAddress {{ ip }}
+{% endfor %}
 {% else %}
 ListenAddress 0.0.0.0
+{% endif %}
 {% endif %}
 {% if openssh_addr_family in ['any', 'inet6'] %}
 {% if openssh_addresses_ipv6 is defined and openssh_addresses_ipv6|length %}
 {% for ip in openssh_addresses_ipv6%}
 ListenAddress {{ ip }}
+{% endfor %}
 {% else %}
 ListenAddress ::1
+{% endif %}
 {% endif %}
 Protocol 2
 
@@ -51,7 +55,7 @@ MACs hmac-sha2-512-etm@openssh.com,hmac-sha2-256-etm@openssh.com,hmac-sha2-512,h
 # While taking the default amount of
 # transferred data (1-4g depending on cipher)
 # do also always rekey after 600 seconds
-RekeyLimit default {{ openssh_reykey_limit_data | default("default") }} {{ openssh_reykey_limit_time | default(600) }}
+RekeyLimit {{ openssh_reykey_limit_data | default("default") }} {{ openssh_reykey_limit_time | default(600) }}
 
 # Set RSA key minimal length
 RequiredRSASize {{ openssh_rsa_minsize | default(4096) }}

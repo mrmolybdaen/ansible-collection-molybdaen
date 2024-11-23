@@ -443,14 +443,12 @@ argument_specs:
       openssh_whitelist_ipv4:
         type: "list"
         elements: "str"
-        default: []
         required: true
         description:
           - "List of IPv4 addresses to allow SSH connections from."
       openssh_whitelist_ipv6:
         type: "list"
         elements: "str"
-        default: []
         required: true
         description:
           - "List of IPv6 addresses to allow SSH connections from."

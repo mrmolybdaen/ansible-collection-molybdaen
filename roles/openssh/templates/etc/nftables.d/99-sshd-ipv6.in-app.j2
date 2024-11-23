@@ -1,3 +1,3 @@
 # Activate logging for accepted connections and whitelist trusted IP addresses
 # or IPs defined in openssh_whitelist variable.
-ip saddr @sshd-v6-acl tcp dport {{ openssh_port | default("$PORT_STANDARD_SSH") }} ct state new log prefix "[nftables accepted] Inbound:" accept{% endraw %}
+ip6 saddr @sshd-v6-acl tcp dport {{ openssh_port | default("$PORT_STANDARD_SSH") }} ct state new log prefix "[nftables accepted] Inbound:" accept

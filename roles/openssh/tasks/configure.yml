@@ -1,7 +1,8 @@
 ---
 
-# This only works flawless if the ansible host does not use RSA
-# to connect to the server.
+# Copyright: (c) 2024, Christian Siegel <molybdaen@mr42.org>
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+
 - name: "configure | Check RSA hostkey length and recreate larger one"
   tags:
     - sshd
@@ -10,7 +11,7 @@
     - name: "configure | Create RSA host key with two times the length of openssh_rsa_minsize"
       community.crypto.openssh_keypair:
         type: "rsa"
-        size: "{{ openssh_rsa_minsize|int * 2 }}"
+        size: "{{ openssh_rsa_minsize | default(4096) | int * 2 }}"
         path: "/etc/ssh/ssh_host_rsa_key"
         comment: "root@{{ ansible_facts['hostname'] }}"
         regenerate: "partial_idempotence"
@@ -34,8 +35,8 @@
   block:
     - name: "configure | Copy standard SSH configuration"
       ansible.builtin.template:
-        src: etc/ssh/openssh_config.j2
-        dest: /etc/ssh/openssh_config
+        src: etc/ssh/sshd_config.j2
+        dest: /etc/ssh/sshd_config
         mode: '0600'
         owner: root
         group: root
@@ -43,10 +44,10 @@
       register: openssh_conf_file_general
       become: true
 
-    - name: "configure | Create directory ssh/openssh_config.d"
+    - name: "configure | Create directory ssh/sshd_config.d"
       ansible.builtin.file:
         state: directory
-        path: /etc/ssh/openssh_config.d
+        path: /etc/ssh/sshd_config.d
         owner: root
         group: root
         mode: '0750'
@@ -55,7 +56,7 @@
     - name: "configure | Create banner file ..."
       when: "openssh_banner_path is defined and openssh_banner_path != 'none'"
       ansible.builtin.template:
-        src: etc/ssh/openssh_config.d/ssh.banner.j2
+        src: etc/ssh/sshd_config.d/ssh.banner.j2
         dest: "{{ openssh_banner_path }}"
         mode: '0600'
         owner: root
@@ -82,7 +83,7 @@
         owner: root
         group: root
         remote_src: true
-        become: true
+      become: true
 
 - name: "configure | Configure PAM"
   ansible.builtin.template:
