@@ -7,7 +7,6 @@
 allow_duplicates: false
 
 # Define role dependencies
-dependencies:
-  - role:
-    vars:
-
+# dependencies:
+#   - role:
+#     vars:

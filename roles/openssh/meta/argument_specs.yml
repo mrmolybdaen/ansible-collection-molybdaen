@@ -17,19 +17,21 @@ argument_specs:
       openssh_addresses_ipv4:
         type: "list"
         required: false
-        default: ["0.0.0.0"]
+        default:
+          - "0.0.0.0"
         description:
           - "It sets the C(ListenAddress) parameter."
           - "List of IPv4 addresses OpenSSH binds to."
-          - "Make sure the list entries match C(openssh_addr_family) with C('any') or C('inet')".
+          - "Make sure the list entries match C(openssh_addr_family) with C('any') or C('inet')."
       openssh_addresses_ipv6:
         type: "list"
         required: false
-        default: ['::1']
+        default:
+          - '::1'
         description:
           - "It sets the C(ListenAddress) parameter."
           - "List of IPv4 addresses OpenSSH binds to."
-          - "Make sure the list entries match C(openssh_addr_family) with C('any') or C('inet6')".
+          - "Make sure the list entries match C(openssh_addr_family) with C('any') or C('inet6')."
       openssh_addr_family:
         type: "str"
         required: false

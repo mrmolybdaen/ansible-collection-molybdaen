@@ -8,5 +8,4 @@ argument_specs:
     short_description:
     description:
     author: Christian Siegel
-    options:
-
+#    options:
