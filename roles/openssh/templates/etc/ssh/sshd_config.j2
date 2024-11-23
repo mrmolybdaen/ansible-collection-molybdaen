@@ -38,7 +38,7 @@ Protocol 2
 HostKey /etc/ssh/ssh_host_rsa_key
 HostKey /etc/ssh/ssh_host_ed25519_key
 # Only accept ED25519 and RSA, no DSS or ECDSA
-PubkeyAcceptedKeyTypes {{ openssh_key_types | default("ssh-ed25519,ssh-ed25519-cert-v01@openssh.com,sk-ssh-ed25519@openssh.com,sk-ssh-ed25519-cert-v01@openssh.com,ssh-rsa,ssh-rsa-cert-v01@openssh.com") }}
+PubkeyAcceptedAlgorithms {{ openssh_pubkey_algorithms | default("ssh-ed25519,ssh-ed25519-cert-v01@openssh.com,sk-ssh-ed25519@openssh.com,sk-ssh-ed25519-cert-v01@openssh.com,ssh-rsa,ssh-rsa-cert-v01@openssh.com") }}
 
 # Set available algorithms
 KexAlgorithms curve25519-sha256@libssh.org,diffie-hellman-group-exchange-sha256
@@ -58,7 +58,7 @@ RequiredRSASize {{ openssh_rsa_minsize | default(4096) }}
 
 # Logging
 SyslogFacility AUTH
-LogLevel VERBOSE
+LogLevel {{ openssh_loglevel | default("VERBOSE") }}
 
 # Authentication:
 
@@ -75,7 +75,7 @@ StrictModes yes
 
 # Max ssh sessions and login attempts
 MaxAuthTries {{ openssh_maxauthtries | default(3) }}
-MaxSessions {{ openssh_maxsessions | default(10) }}
+MaxSessions {{ openssh_maxsessions | default(5) }}
 # Specifies number of concurrent unauthenticated sessions
 # start:rate:full
 MaxStartups {{ openssh_maxstartups | default("25:50:60") }}
@@ -139,7 +139,7 @@ AllowAgentForwarding {{ openssh_forward_agent | default("no") }}
 X11Forwarding {{ openssh_forward_x11 | default("no") }}
 GatewayPorts {{ openssh_gatewayports | default("no") }}
 
-PrintMotd {{ openssh_motd | default("yes") }}
+PrintMotd {{ openssh_motd | default("no") }}
 PrintLastLog {{ openssh_print_lastlog | default("yes") }}
 TCPKeepAlive {{ openssh_tcp_keepalive | default("yes") }}
 PermitUserRC {{ openssh_permituserrc | default("no") }}
@@ -147,13 +147,13 @@ PermitUserRC {{ openssh_permituserrc | default("no") }}
 # Any recommendation to disable this setting is based on a
 # deprecated OpenSSH older than 2005 and does not make sense in 2020s
 Compression {{ openssh_compression | default("yes") }}
-ClientAliveInterval {{ openssh_clientalive_interval | default(60) }}
-ClientAliveCountMax {{ openssh_clientalive_countmax | default(10) }}
+ClientAliveInterval {{ openssh_clientalive_interval | default(10) }}
+ClientAliveCountMax {{ openssh_clientalive_countmax | default(9) }}
 UseDNS {{ openssh_usedns | default("no") }}
 PidFile {{ openssh_pidfile | default("/run/sshd.pid") }}
 PermitTunnel {{ openssh_permittunnel | default("no") }}
 ChrootDirectory {{ openssh_chrootdir | default("none") }}
-#VersionAddendum {{ openssh_versionaddendum | default("none") }}
+VersionAddendum {{ openssh_versionaddendum | default("none") }}
 
 # no default banner pathclient
 Banner {{ openssh_banner_path | default("none") }}

@@ -60,7 +60,7 @@ argument_specs:
         required: false
         description:
           - "Optional text for OpenSSH banner."
-          - "This variable will be used in C('openssh_config.d/ssh.banner')"
+          - "This variable will be used in C('openssh_config.d/ssh.banner') or any path given by C(openssh_banner_path)"
       openssh_banner_path:
         type: "str"
         required: false
@@ -89,11 +89,18 @@ argument_specs:
       openssh_clientalive_countmax:
         type: "int"
         required: false
+        default: 9
         description:
+          - "Set up C(ClientAliveCountMax) configuration directive."
+          - "This option defines the number of client alive messages without receiving any messages back from the client"
+          - "A value of C(0) will will disable the client alive mechanism."
       openssh_clientalive_interval:
         type: "int"
         required: false
+        default: 10
         description:
+          - "Set up C(ClientAliveInterval) configuration directive."
+          - "Set the timeout interval in seconds after which a client alive message will be send when no data was received"
       openssh_compression:
         type: "str"
         required: false
@@ -110,11 +117,11 @@ argument_specs:
         type: "str"
         required: false
         default: "no"
-        description:
-          - "Sets C(PermitEmptyPasswords) configuration parameter"
         choices:
           - "yes"
           - "no"
+        description:
+          - "Sets C(PermitEmptyPasswords) configuration parameter"
       openssh_forward_agent:
         type: "str"
         required: false
@@ -194,19 +201,74 @@ argument_specs:
           - "Set the C(KerberosAuthentication) directive."
           - "Decide whether login credentials provided by the user will be validated through the Kerberos KDC."
           - "Further configuration should be places in a separate role configuring Kerberos in C('/etc/ssh/sshd_config.d/')"
-      openssh_key_types:
       openssh_login_gracetime:
+        type: "int"
+        required: false
+        default: 30
+        description:
+          - "Set the C(LoginGraceTime) directive"
+          - "Disconnect after C(openssh_login_gracetime) seconds if no successful login happend."
+          - "A value of V(0) defines the absence of a limit."
+      openssh_loglevel:
+        type: "str"
+        required: false
+        default: "VERBOSE"
+        choices:
+          - "QUIET"
+          - "FATAL"
+          - "ERROR"
+          - "INFO"
+          - "VERBOSE"
+          - "DEBUG1"
+          - "DEBUG2"
+          - "DEBUG3"
+        description:
+          - "Sets the C(LogLevel) configuration directive."
+          - "Define the log level."
+          - "sshd_config(5) states C(DEBUG) and C(DEBUG1) are equivalent. This is why this role only accepts C(DEBUG1)."
       openssh_maxauthtries:
+        type: "int"
+        required: false
+        default: 3
+        description:
+          - "Set the C(MaxAuthTries) directive."
+          - "Define the maximum number of authentication attempts per connection."
       openssh_maxsessions:
+        type: "int"
+        required: false
+        default: 5
+        description:
+          - "Sets the C(MaxSessions) configuration directive."
+          - "Define the maximum allowed number of shell, login or subsystem sessions per network connection"
+          - "A value of C(1) will disable session multiplexing."
+          - "A value of C(0) will prevent shell, login and subsystem sessions except forwarding"
       openssh_maxstartups:
-      openssh_maxstartiups_persource:
+        type: "str"
+        required: false
+        default: "25:50:60"
+        description:
+          - "Set the C(MaxStartups) configuration directive."
+          - "Set the maximum number of unauthenticated connections to the SSH daemon"
+          - "This is a colon seperated triple of C(start:rate:full) which defines when and how connections are refused."
+          - "See OpenSSH manpage for more information."
+      openssh_maxstartups_persource:
+        type: "int"
+        required: false
+        default: "6"
+        description:
+          - "Set the C(PerSourceMaxStartups) directive."
+          - "Specify the number number of unauthenticated connections allowed from a given source."
+          - "This is additionally to C(MaxStartups) whichever is lower as sshd_config(5) states."
       openssh_motd:
         type: "str"
         required: false
+        default: "no"
         choices:
           - "yes"
           - "no"
         description:
+          - "Sets the C(PrintMotd) configuration directive."
+          - "Enable or disable the output of the message of the day."
       openssh_passwordauthentication:
         type: "str"
         required: false
@@ -224,15 +286,29 @@ argument_specs:
         choices:
           - "yes"
           - "no"
+          - "point-to-point"
+          - "ethernet"
         description:
+          - "Set the C(PermitTunnel) configuration directive"
+          - "Using C('yes') will allow C('ethernet') (layer 2) and C('point-to-point') (layer 3)"
+          - "If set do C('no') will also prevent access to databases bound to localhost on the server via IDEs and other related use cases."
       openssh_permituserrc:
         type: "str"
         required: false
+        default: "no"
         choices:
           - "yes"
           - "no"
         description:
+          - "Set the C(PermitUserRC) directive."
+          - "Whether or not to run any C('~/.ssh/rc')."
       openssh_pidfile:
+        type: "str"
+        required: false
+        default: "/run/sshd.pid"
+        description:
+          - "Set up the C(PidFile) configuration directive."
+          - "Set the path to the PID file."
       openssh_port:
         type: "str"
         default: "$PORT_STANDARD_SSH"
@@ -244,10 +320,13 @@ argument_specs:
       openssh_print_lastlog:
         type: "str"
         required: false
+        default: "yes"
         choices:
           - "yes"
           - "no"
         description:
+          - "Set the C(PrintLastLog) configuration directive."
+          - "Enable or disable printing the lastlog in login."
       openssh_pubkeyauthentication:
         type: "str"
         required: false
@@ -258,6 +337,17 @@ argument_specs:
         description:
           - "Set up C(PubkeyAuthentication) directive."
           - "Enable or disable public key authentication."
+      openssh_pubkey_algorithms:
+        type: "str"
+        required: false
+        default: "ssh-ed25519,ssh-ed25519-cert-v01@openssh.com,sk-ssh-ed25519@openssh.com,sk-ssh-ed25519-cert-v01@openssh.com,ssh-rsa,ssh-rsa-cert-v01@openssh.com"
+        description:
+          - "Sets the C(PubkeyAcceptedKeyTypes) configuration directive."
+          - "Accept only the given signature algorithms given by this comma seperated list. (Replace OpenSSH default set)"
+          - "Prepending the option string with C(+) will append the given algorithms to the default set."
+          - "Prepending the option string with C(-) the given algorithms will be removed from the default."
+          - "Prepending the option string with C(^) the given algorithms will be placed at the head of the default set."
+          - "See sshd_config(5) for further information."
       openssh_rekey_limit_time:
         type: "str"
         required: false
@@ -267,7 +357,7 @@ argument_specs:
           - "Define the amount of transferred data until a renegotiation takes place."
           - "Defaults to the amount of data specified by the cipher."
           - "Given in bytes, one can use SI-prefixes like C(K), C(M) or C(G)."
-      openssh_rekey_limit_time:
+      openssh_rekey_limit_data:
         type: "str"
         required: false
         default: "600"
@@ -342,6 +432,12 @@ argument_specs:
           - "Sets the C(AllowUsers) configuration parameter."
           - "If unset, will not create a configuration entry for it"
       openssh_versionaddendum:
+        type: "str"
+        required: false
+        default: "none"
+        description:
+          - "Set up the C(VersionAddendum) configuration directive."
+          - "This option defines a string which can be added to the SSH protocol banner sent upon connection."
       openssh_whitelist_ipv4:
         type: "list"
         elements: "str"
