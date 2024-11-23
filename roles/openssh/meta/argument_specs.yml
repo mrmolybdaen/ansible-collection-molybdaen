@@ -13,23 +13,28 @@ argument_specs:
       - "View the OpenSSH daemon manual page for more information using C(man openssh_config)"
     author: Christian Siegel
     options:
-      openssh_addresses:
+      openssh_addresses_ipv4:
         type: "list"
         required: false
+        default: ["0.0.0.0"]
         description:
           - "It sets the C(ListenAddress) parameter."
-          - "List of addresses OpenSSH binds to."
-          - "Make sure the list entries match C(openssh_addr_family)".
-          - "This does not have a default. But if not set, it defaults to all addresses depending on C(openssh_addr_family)"
-          - "If C(openssh_addr_family) is not set or C('any') OpenSSH will bind to C(::1) and C(0.0.0.0)"
-          - "If C(openssh_addr_family) is set to C('inet') this will default to C(0.0.0.0)."
-          - "If C(openssh_addr_family) is set to C('inet6') this will default C(::1)."
+          - "List of IPv4 addresses OpenSSH binds to."
+          - "Make sure the list entries match C(openssh_addr_family) with C('any') or C('inet')".
+      openssh_addresses_ipv6:
+        type: "list"
+        required: false
+        default: ['::1']
+        description:
+          - "It sets the C(ListenAddress) parameter."
+          - "List of IPv4 addresses OpenSSH binds to."
+          - "Make sure the list entries match C(openssh_addr_family) with C('any') or C('inet6')".
       openssh_addr_family:
         type: "str"
         required: false
+        default: "any"
         description:
           - "This sets OpenSSH the C(AddressFamily) configuration parameter."
-          - "In C('/etc/ssh/openssh_config') this defaults to any if not defined."
         choices:
           - "any"
           - "inet"
@@ -37,6 +42,7 @@ argument_specs:
       openssh_authmethod:
         type: "str"
         required: false
+        default: "publickey"
         description:
           - "This sets the C(AuthenticationMethods) configuration parameter."
           - "This takes only one method."
@@ -57,6 +63,7 @@ argument_specs:
       openssh_banner_path:
         type: "str"
         required: false
+        default: "none"
         description:
           - "This sets the C(Banner) configuration parameter."
           - "This is either C('none') or a path to a banner file."
@@ -65,11 +72,19 @@ argument_specs:
       openssh_challenge_response:
         type: "str"
         required: false
+        choices:
+          - "yes"
+          - "no"
+        default: "no"
         description:
+          - "This sets the C(ChallengeResponseAuthentication) configuration parameter"
+          - "Change to 'yes' to enable challenge-response passwords"
       openssh_chrootdir:
         type: "str"
         required: false
+        default: "none"
         description:
+          - "Sets the C(ChrootDirectory) sshd configuration parameter."
       openssh_clientalive_countmax:
         type: "int"
         required: false
@@ -81,6 +96,7 @@ argument_specs:
       openssh_compression:
         type: "str"
         required: false
+        default: "yes"
         choices:
           - "yes"
           - "no"
@@ -92,6 +108,7 @@ argument_specs:
       openssh_empty_passwords:
         type: "str"
         required: false
+        default: "no"
         description:
           - "Sets C(PermitEmptyPasswords) configuration parameter"
         choices:
@@ -100,6 +117,7 @@ argument_specs:
       openssh_forward_agent:
         type: "str"
         required: false
+        default: "no"
         choices:
           - "yes"
           - "no"
@@ -109,53 +127,72 @@ argument_specs:
       openssh_forward_tcp:
         type: "str"
         required: false
+        default: "no"
         choices:
           - "yes"
           - "no"
         description:
           - "Sets C(AllowTcpForwarding) configuration parameter"
-          - "Defaults to C('no')."
       openssh_forward_x11:
         type: "str"
         required: false
+        default: "no"
         description:
           - "Sets C(AllowX11Fowarding) configuration parameter"
-          - "Defaults to C('no')."
       openssh_gatewayports:
         type: "str"
         required: false
+        default: "no"
         choices:
           - "yes"
           - "no"
+          - "clientspecified"
         description:
+          - "Sets C(GatewayPorts) configuration parameter"
+          - "Specifies whether remote hosts are allowed to connect to forwarded ports for the client."
       openssh_gssapi:
         type: "str"
         required: false
+        default: "no"
         choices:
           - "yes"
           - "no"
         description:
+          - "Sets C(GSSAPIAuthentication) configuration parameter."
+          - "Allow or disallow authentication based on GSSAPI."
+          - "Further GSSAPI configuration might happen in a separate role within a file in C('/etc/ssh/sshd_config.d')"
       openssh_ignore_rhosts:
         type: "str"
         required: false
+        default: "yes"
         choices:
           - "yes"
           - "no"
         description:
+          - "Sets the C(IgnoreRHosts) configuration directive."
+          - "Ignore or allow per-user C('.rhosts') and C('.shosts') files during HostbasedAuthentication"
+          - "This does not ignore system-wide files like C('/etc/hosts.equiv') and C('/etc/ssh/shosts.equiv')"
       openssh_ignore_user_knownhosts:
         type: "str"
         required: false
+        default: "no"
         choices:
           - "yes"
           - "no"
         description:
+          - "Sets the C(IgnoreUserKnownHosts) configuration directive."
+          - "Decide whether to use only system-wide C('/etc/ssh/ssh_known_hosts') or to allow C('~/.ssh/known_hosts') too."
       openssh_kerberos:
         type: "str"
         required: false
+        default: "no"
         choices:
           - "yes"
           - "no"
         description:
+          - "Set the C(KerberosAuthentication) directive."
+          - "Decide whether login credentials provided by the user will be validated through the Kerberos KDC."
+          - "Further configuration should be places in a separate role configuring Kerberos in C('/etc/ssh/sshd_config.d/')"
       openssh_key_types:
       openssh_login_gracetime:
       openssh_maxauthtries:
@@ -233,11 +270,11 @@ argument_specs:
         default: []
         required: true
         description:
-          - "List of IPv4 addresses"
+          - "List of IPv4 addresses to allow SSH connections from."
       openssh_whitelist_ipv6:
         type: "list"
         elements: "str"
         default: []
         required: true
         description:
-          - "List of IPv6 addresses"
+          - "List of IPv6 addresses to allow SSH connections from."
