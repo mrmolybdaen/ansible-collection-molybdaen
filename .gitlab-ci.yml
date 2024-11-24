@@ -20,8 +20,7 @@ prebuild:ansible:sanity:
     - echo "Running ansible-test sanity ..."
     - mkdir -p /ansible_collections/mrmolybdaen/
     - ln -s $CI_PROJECT_DIR /ansible_collections/mrmolybdaen/molybdaen
-    - cd /ansible_collections/mrmolybdaen/molybdaen
-    - ansible-test sanity
+    - cd /ansible_collections/mrmolybdaen/molybdaen; ansible-test sanity
 
 prebuild:ansible:integration:
   stage: test-prebuild
