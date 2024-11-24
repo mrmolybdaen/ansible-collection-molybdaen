@@ -5,15 +5,24 @@
 
 - name: "nftables | Check if fallback file exists ..."
   ansible.builtin.stat:
-    path: "/etc/nftables.d/99-sshd-fallback.in-app"
-  register: openssh_fallback_exists
+    path: "/etc/nftables.d/99-sshd-fallback-ipv4.app"
+  register: openssh_fallback_exists_ipv4
+  tags:
+    - sshd
+    - sshd-nftables
+    - nftables
+
+- name: "nftables | Check if fallback file exists ..."
+  ansible.builtin.stat:
+    path: "/etc/nftables.d/99-sshd-fallback-ipv6.app"
+  register: openssh_fallback_exists_ipv6
   tags:
     - sshd
     - sshd-nftables
     - nftables
 
 - name: "nftables | Cleanup sshd fallback file ..."
-  when: openssh_fallback_exists.stat.exists
+  when: openssh_fallback_exists_ipv4.stat.exists or openssh_fallback_exists_ipv6.stat.exists
   tags:
     - sshd
     - sshd-nftables
@@ -30,33 +39,56 @@
       changed_when: nftables_deployment_source.rc == 0
       become: false
 
-    - name: "nftables | Set cleanup variable"
+    - name: "nftables | Set cleanup variable for IPv4"
       when: item | ansible.utils.network_in_network( nftables_deployment_source.stdout )
       ansible.builtin.set_fact:
-        openssh_nftables_cleanup: true
-      loop: "{{ openssh_allowed_ips }}"
+        openssh_nftables_cleanup_ipv4: true
+      loop: "{{ openssh_whitelist_ipv4 }}"
 
-    - name: "nftables | Cleanup message success ..."
-      when: openssh_nftables_cleanup is defined and openssh_nftables_cleanup
+    - name: "nftables | IPv4 cleanup message success ..."
+      when: openssh_nftables_cleanup_ipv4 is defined and openssh_nftables_cleanup_ipv4
       ansible.builtin.debug:
         msg: "Fallback file can be cleaned up."
 
-    - name: "nftables | Cleanup message fail ..."
-      when: openssh_nftables_cleanup is not defined
+    - name: "nftables | IPv4 cleanup message fail ..."
+      when: openssh_nftables_cleanup_ipv4 is not defined
       ansible.builtin.debug:
         msg: "WARNING: Fallback file cannot be removed."
 
-    - name: "nftables | Cleanup ..."
-      when: openssh_nftables_cleanup is defined and openssh_nftables_cleanup
+    - name: "nftables | Set cleanup variable for IPv4"
+      when: item | ansible.utils.network_in_network( nftables_deployment_source.stdout )
+      ansible.builtin.set_fact:
+        openssh_nftables_cleanup_ipv6: true
+      loop: "{{ openssh_whitelist_ipv6 }}"
+
+    - name: "nftables | IPv6 cleanup message success ..."
+      when: openssh_nftables_cleanup_ipv6 is defined and openssh_nftables_cleanup_ipv6
+      ansible.builtin.debug:
+        msg: "IPv6 fallback file can be cleaned up."
+
+    - name: "nftables | IPv4 cleanup message fail ..."
+      when: openssh_nftables_cleanup_ipv6 is not defined
+      ansible.builtin.debug:
+        msg: "WARNING: IPv6 fallback file cannot be removed."
+
+    - name: "nftables | Cleanup IPv4 ..."
+      when: openssh_nftables_cleanup_ipv4 is defined and openssh_nftables_cleanup_ipv6
       ansible.builtin.file:
-        path: "/etc/nftables.d/99-sshd-fallback.in-app"
+        path: "/etc/nftables.d/99-sshd-fallback-ipv4.app"
+        state: absent
+      become: true
+
+    - name: "nftables | Cleanup IPv6 ..."
+      when: openssh_nftables_cleanup_ipv6 is defined and openssh_nftables_cleanup_ipv6
+      ansible.builtin.file:
+        path: "/etc/nftables.d/99-sshd-fallback-ipv6.app"
         state: absent
       become: true
 
 - name: "nftables | Add SSH rule"
   ansible.builtin.template:
-    src: "etc/nftables.d/99-sshd-ipv4.in-app.j2"
-    dest: "/etc/nftables.d/99-sshd-ipv4.in-app"
+    src: "etc/nftables.d/99-sshd-ipv4.app.j2"
+    dest: "/etc/nftables.d/99-sshd-ipv4.app"
     mode: "0640"
     owner: root
     group: root
@@ -69,8 +101,8 @@
 
 - name: "nftables | Add SSH rule"
   ansible.builtin.template:
-    src: "etc/nftables.d/99-sshd-ipv6.in-app.j2"
-    dest: "/etc/nftables.d/99-sshd-ipv6.in-app"
+    src: "etc/nftables.d/99-sshd-ipv6.app.j2"
+    dest: "/etc/nftables.d/99-sshd-ipv6.app"
     mode: "0640"
     owner: root
     group: root

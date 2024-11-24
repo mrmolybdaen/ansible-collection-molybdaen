@@ -9,8 +9,8 @@ argument_specs:
     description:
       - "Configure ssh and its services."
       - "Configure firewall rules for ssh"
-      - "This role depends on C('nftables')"
-      - "View the OpenSSH daemon manual page for more information using C(man openssh_config)"
+      - "This role depends on P(mrmolybdaen.molybdaen.nftables#role)"
+      - "View the OpenSSH daemon manual page for more information using C(man sshd_config)"
       - "The OpenSSH daemon has a lot of directive. This role does not aim to provide options for of them."
     author: Christian Siegel
     options:
@@ -446,9 +446,11 @@ argument_specs:
         required: true
         description:
           - "List of IPv4 addresses to allow SSH connections from."
+          - "This can be set to an empty list, but it should be set on purpose."
       openssh_whitelist_ipv6:
         type: "list"
         elements: "str"
         required: true
         description:
           - "List of IPv6 addresses to allow SSH connections from."
+          - "This can be set to an empty list, but it should be defined purposefully."
