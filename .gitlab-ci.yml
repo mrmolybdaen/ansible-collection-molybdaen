@@ -18,6 +18,9 @@ prebuild:ansible:sanity:
   stage: test-prebuild
   script:
     - echo "Running ansible-test sanity ..."
+    - mkdir -p /ansible_collections/mrmolybdaen/
+    - ln -s $CI_PROJECT_DIR /ansible_collections/mrmolybdaen/molybdaen
+    - cd /ansible_collections/mrmolybdaen/molybdaen
     - ansible-test sanity
 
 prebuild:ansible:integration:
@@ -36,7 +39,7 @@ prebuild:ansible:units:
 
 prebuild:flake8:codestyle-py313:
   stage: test-prebuild
-  image: python:3.13-alpine
+  image: alpine/flake8
   script:
     - python3 --version
     - python3 -m pip install -r requirements-test.txt
@@ -50,6 +53,9 @@ build:galaxy:
     - echo "Create build directory ..."
     - mkdir -p build
     - echo "Create the collection package ..."
+    - mkdir -p /ansible_collections/mrmolybdaen/
+    - ln -s $CI_PROJECT_DIR /ansible_collections/mrmolybdaen/molybdaen
+    - cd /ansible_collections/mrmolybdaen/molybdaen
     - ansible-galaxy collection build --output-path build/
   artifacts:
     untracked: false
