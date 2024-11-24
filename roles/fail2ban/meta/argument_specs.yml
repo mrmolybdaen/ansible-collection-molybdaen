@@ -5,11 +5,11 @@
 
 argument_specs:
   main:
-    short_description: This role does basic configuration fpr fail2ban
+    short_description: This role does basic configuration for fail2ban
     description:
       - This role provides basic configuration for fail2ban.
       - It handles systemd configuration overrides as well the connection to nftables.
-      - This role depends on the `nftables` role.
+      - This role depends on the P(mrmolybdaen.molybdaen.nftables#role) role.
     author: Christian Siegel
     options:
       fail2ban_whitelist:

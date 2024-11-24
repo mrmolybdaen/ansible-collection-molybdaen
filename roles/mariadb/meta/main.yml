@@ -8,5 +8,4 @@ allow_duplicates: false
 
 # Define role dependencies
 dependencies:
-  - role:
-    vars:
+  - role: mrmolybdaen.molybdaen.nftables

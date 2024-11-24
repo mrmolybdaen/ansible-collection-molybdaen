@@ -1,1 +1,4 @@
-jinja2
+ansible>=11.0
+antsibull>=0.68
+antsibull-changelog>=0.26
+antsibull-docs>=2.9
