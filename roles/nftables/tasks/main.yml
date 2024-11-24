@@ -5,7 +5,7 @@
 
 
 - name: "Do the firewall stuff ..."
-  when: nftables_configure is defined and not nftables_configure
+  when: nftables_configure is defined and nftables_configure
   block:
     - name: "Import configuration ..."
       ansible.builtin.import_tasks: "configure.yml"

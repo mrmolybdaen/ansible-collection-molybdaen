@@ -63,7 +63,7 @@
 - name: "configure | Check if sshd config exists ..."
   when: nftables_ip_matches.stdout | int < 2
   ansible.builtin.lineinfile:
-    path: "/etc/nftables.d/99-sshd-fallback-ipv{{ nftables_ssh_fallback_protocol_version }}.in-app"
+    path: "/etc/nftables.d/99-sshd-fallback-ipv{{ nftables_ssh_fallback_protocol_version }}.app"
     create: true
     mode: "0640"
     owner: root
@@ -71,7 +71,14 @@
     line: 'ip saddr $SOURCE_ANSIBLE_DEPLOYMENT tcp dport $PORT_STANDARD_SSH ct state new log prefix "[nftables accepted] Inbound:" accept'
   become: true
   tags:
-    nftables
+    - nftables
+
+- name: "configure | Check if a public interface is defined, if not use the first non-loopback interface ..."
+  when: nftables_interface_public is not defined
+  ansible.builtin.set_fact:
+    nftables_interface_public: "{{ ansible_facts['interfaces'][1] }}"
+  tags:
+    - nftables
 
 - name: "configure | Create global server configuration ..."
   ansible.builtin.template:
@@ -84,8 +91,16 @@
   tags:
     - nftables
 
+- name: "configure | Masquerading settings ..."
+  ansible.builtin.set_fact:
+    nftables_masquerade_ipv6: nftables_masquerade.ipv6 is defined and nftables_masquerade.ipv6|length
+    nftables_masquerade_ipv4: nftables_masquerade.ipv4 is defined and nftables_masquerade.ipv4|length
+  tags:
+    - nftables
+    - nftables-router
+
 - name: "configure | Provide addresses and ranges to masquerade ..."
-  when: nftables_masquerade is defined and (nftables_masquerade.ipv6|length or nftables_masquerade.ipv4|length)
+  when: nftables_masquerade is defined and (nftables_masquerade_ipv6 or nftables_masquerade_ipv4)
   ansible.builtin.template:
     src: "etc/nftables.d/97-masquerade.set.j2"
     dest: "/etc/nftables.d/97-masquerade.set"

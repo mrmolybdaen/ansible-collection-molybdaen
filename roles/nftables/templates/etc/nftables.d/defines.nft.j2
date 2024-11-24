@@ -1,7 +1,15 @@
-# Known source IP addresses
-{% if nftables_known_sources is defined and nftables_known_source|length %}
+{% if nftables_known_sources is defined and nftables_known_sources|length %}
+# Known and named source addresses
 {% for source in nftables_known_sources %}
 define SOURCE_{{ source.name }} = {{ source.ip }}
+{% endfor %}
+{% endif %}
+
+{# This currently does not support variable lists. A workaround might be sets. #}
+{% if nftables_interfaces is defined and nftables_interfaces|length %}
+# Define variables for interfaces
+{% for interface in nftables_interfaces %}
+define INTERFACE_{{ interface.var }} = {{ interface.interface }}
 {% endfor %}
 {% endif %}
 
@@ -23,5 +31,6 @@ define PORT_STANDARD_RPC = 111
 define PORT_STANDARD_SNMP = 162
 define PORT_STANDARD_SSH = 22
 
+{# TODO: This is not cleaned up currently. We will change that in a future version. #}
 # Ansible deployment source
 define SOURCE_ANSIBLE_DEPLOYMENT = {{ nftables_deployment_source.stdout }}

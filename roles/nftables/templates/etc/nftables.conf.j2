@@ -25,8 +25,8 @@ table inet firewall {
         #
         icmp type echo-request limit rate 2/second accept
 
-        # Include application specific general rules from files in /etc/nftables.d/*-ipv4.in-app
-        include "/etc/nftables.d/*-ipv4.in-app"
+        # Include application specific general rules from files in /etc/nftables.d/*-ipv4.app
+        include "/etc/nftables.d/*-ipv4.app"
     }
 
     # We are using IPv6 only on the public interfaces.
@@ -45,8 +45,8 @@ table inet firewall {
         #
         icmpv6 type echo-request limit rate 2/second accept
 
-        # Include application specific general rules from files in /etc/nftables.d/*-ipv6.in-app
-        include "/etc/nftables.d/*-ipv6.in-app"
+        # Include application specific general rules from files in /etc/nftables.d/*-ipv6.app
+        include "/etc/nftables.d/*-ipv6.app"
     }
 
     chain inbound {
@@ -110,15 +110,15 @@ table inet firewall {
         type nat hook postrouting priority 100; policy accept;
 
         # masquerade private IP addresses
-{% if nftables_masquerade.ipv4 is defined %}
+{% if nftables_masquerade.ipv4 is defined and nftables_masquerade.ipv4%}
         # Masquerade IPv4 addresses defined in set masquerade-source-ipv4
         # from /etc/nftables.d/97-masquerade.set
-        ip saddr @masquerade-source-ipv4 oifname $IF_PUBLIC masquerade
+        ip saddr @masquerade-source-v4 oifname {{ nftables_interface_public | default('$INTERFACE_PUBLIC') }} masquerade
 {% endif %}
-{% if nftables_masquerade.ipv6 is defined %}
+{% if nftables_masquerade.ipv6 is defined and nftables_masquerade.ipv6 %}
         # Masquerade IPv6 addresses defined in set masquerade-source-ipv6
         # defined in /etc/nftables.d/97-masquerade.set
-        ip saddr @masquerade-source-ipv6 oifname $IF_PUBLIC masquerade
+        ip6 saddr @masquerade-source-v6 oifname {{ nftables_interface_public | default('$INTERFACE_PUBLIC') }} masquerade
 {% endif %}
     }
 {% endif %}
