@@ -1,0 +1,119 @@
+# This is an ansible project, we use an ansible image by default.
+image: "alpine/ansible:latest"
+
+# Define tests
+# We can do two types of tests: pre- and postbuild.
+# Postbuild are tests and which run against the package.
+stages:
+  - test-prebuild
+  - build
+  - test-postbuild
+  - test-run
+  - deploy
+  - docs
+
+# Do pre-build tests. This is everything from code quality and style
+# to some pythonic syntax checks.
+prebuild:ansible:sanity:
+  stage: test-prebuild
+  script:
+    - echo "Running ansible-test sanity ..."
+    - ansible-test sanity
+
+prebuild:ansible:integration:
+  stage: test-prebuild
+  script:
+    - echo "Running unit tests... This will take about 60 seconds."
+    - sleep 60
+    - echo "Code coverage is 90%"
+
+prebuild:ansible:units:
+  stage: test-prebuild
+  script:
+    - echo "Running unit tests... This will take about 60 seconds."
+    - sleep 60
+    - echo "Code coverage is 90%"
+
+prebuild:flake8:codestyle-py313:
+  stage: test-prebuild
+  image: python:3.13-alpine
+  script:
+    - python3 --version
+    - python3 -m pip install -r requirements-test.txt
+    - python3 -m pip install -r requirements.txt
+    - flake8 --black-config "test/ansible-lint/.black" --config "test/ansible-lint/.flake8" --color always
+
+# Build the ansible collection
+build:galaxy:
+  stage: build
+  script:
+    - echo "Create build directory ..."
+    - mkdir -p build
+    - echo "Create the collection package ..."
+    - ansible-galaxy collection build --output-path build/
+  artifacts:
+    untracked: false
+    when: on_success
+    access: all
+    expire_in: 1d
+    paths:
+      - build
+
+# The ansible-playbook command provides a syntax check which
+# can help detect syntax problems.
+postbuild:ansible:syntax:
+  stage: test-postbuild
+  script:
+    - echo "hello ansible syntax"
+
+# The ansible-playbook command provides a dry-run option
+# We use it to run against virtual machines with some example configuration
+postbuild:ansible:dryrun:
+  stage: test-postbuild
+  script:
+    - echo "hello dryrun"
+
+# Finally, when the dry-run succeeds, deploy the playbook
+# to one ubuntu and one debian host
+test:ansible:run-debian12:
+  stage: test-run
+  script:
+    - echo "hello debian 12"
+
+test:ansible:run-debian13:
+  stage: test-run
+  script:
+    - echo "hello debian 13"
+
+test:ansible:run-ubuntu2204:
+  stage: test-run
+  script:
+    - echo "hello ubuntu 2204"
+
+test:ansible-run-ubuntu2404:
+  stage: test-run
+  script:
+    - echo "hello ubuntu 2204"
+
+
+# If all tests are fine, publish the collection in ansible-galaxy
+release:deploy:
+  stage: deploy
+  environment: production
+  rules:
+      - if: $CI_COMMIT_TAG != '' && $CI_COMMIT_TAG
+  script:
+    - echo "Deploying application..."
+    - echo "Application successfully deployed."
+
+release:release:
+  stage: deploy
+  image: registry.gitlab.com/gitlab-org/release-cli:latest
+  environment: production
+  rules:
+    - if: $CI_COMMIT_TAG != '' && $CI_COMMIT_TAG
+  script:
+      - echo "Create release in Gitlab"
+  release:
+    tag_name: '$CI_COMMIT_TAG'
+    description: '$CI_COMMIT_TAG'

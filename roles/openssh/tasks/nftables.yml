@@ -72,7 +72,7 @@
         msg: "WARNING: IPv6 fallback file cannot be removed."
 
     - name: "nftables | Cleanup IPv4 ..."
-      when: openssh_nftables_cleanup_ipv4 is defined and openssh_nftables_cleanup_ipv6
+      when: openssh_nftables_cleanup_ipv4 is defined and openssh_nftables_cleanup_ipv4
       ansible.builtin.file:
         path: "/etc/nftables.d/99-sshd-fallback-ipv4.app"
         state: absent

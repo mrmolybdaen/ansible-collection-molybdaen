@@ -190,3 +190,8 @@ NOTES
 *.tar.gz
 *.gz
 *.xz
+
+test.sh
+docs
+docs/*
+docs/.*
