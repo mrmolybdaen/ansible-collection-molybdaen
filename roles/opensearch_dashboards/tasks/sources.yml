@@ -1,7 +1,7 @@
 ---
 
-# Copyright: (c) 2024, Christian Siegel <molybdaen@mr42.org>
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# Copyright: (c) 2025, Christian Siegel <molybdaen@mr42.org>
+# GNU General Public License v3.0+ (see LICENSE or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 - name: "sources | Install prerequisities ..."
   ansible.builtin.apt:
@@ -12,30 +12,30 @@
       - curl
   become: true
   tags:
-    - opensearch-dashboards
-    - opensearch-dashboards-sources
-    - opensearch-dashboards-sources-apt
+    - opensearch_dashboards
+    - opensearch_dashboards-sources
+    - opensearch_dashboards-sources-apt
 
 - name: "sources | Get and install repository key ..."
   ansible.builtin.deb822_repository:
-    name: "opensearch-dashboards"
+    name: "opensearch_dashboards"
     types: deb
     suites: stable
     components: main
-    uris: "https://artifacts.opensearch.org/releases/bundle/opensearch-dashboards/2.x/apt"
+    uris: "https://artifacts.opensearch.org/releases/bundle/opensearch-dashboards/{{ opensearch_dashboards_version | default('2.x') }}/apt"
     signed_by: "https://artifacts.opensearch.org/publickeys/opensearch.pgp"
   become: true
   tags:
-    - opensearch-dashboards
-    - opensearch-dashboards-sources
-    - opensearch-dashboards-sources-list
+    - opensearch_dashboards
+    - opensearch_dashboards-sources
+    - opensearch_dashboards-sources-list
 
 - name: "sources | Update repository cache ..."
   ansible.builtin.apt:
     update_cache: true
   become: true
   tags:
-    - opensearch-dashboards
-    - opensearch-dashboards-dashboards-sources
-    - opensearch-dashboards-dashboards-sources-list
-    - opensearch-dashboards-dashboards-sources-key
+    - opensearch_dashboards
+    - opensearch_dashboards-dashboards-sources
+    - opensearch_dashboards-dashboards-sources-list
+    - opensearch_dashboards-dashboards-sources-key

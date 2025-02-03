@@ -1,28 +1,34 @@
 ---
 
-# Copyright: (c) 2024, Christian Siegel <molybdaen@mr42.org>
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# Copyright: (c) 2025, Christian Siegel <molybdaen@mr42.org>
+# GNU General Public License v3.0+ (see LICENSE or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 - name: "Import sources list configuration tasks ..."
   ansible.builtin.import: "sources.yml"
   tags:
-    - opensearch
-    - opensearch-sources
+    - opensearch-dashboards
+    - opensearch-dashboards-sources
 
 - name: "Import install tasks ..."
   ansible.builtin.import: "install.yml"
   tags:
-    - opensearch
-    - opensearch-install
+    - opensearch-dashboards
+    - opensearch-dashboards-install
+
+- name: "Import systemd tasks ..."
+  ansible.builtin.import: "systemd.yml"
+  tags:
+    - opensearch-dashboards
+    - opensearch-dashboards-systemd
 
 - name: "Import OpenSearch configuration tasks ..."
   ansible.builtin.import: "configure.yml"
   tags:
-    - opensearch
-    - opensearch-config
+    - opensearch-dashboards
+    - opensearch-dashboards-config
 
 - name: "Import OpenSearch user configuration ..."
-  ansible.builtin.import: "users.yyml"
+  ansible.builtin.import: "users.yml"
   tags:
-    - opensearch
-    - opensearch-users
+    - opensearch-dashboards
+    - opensearch-dashboards-users

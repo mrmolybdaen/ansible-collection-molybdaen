@@ -1,12 +1,12 @@
 ---
 
-# Copyright: (c) 2024, Christian Siegel <molybdaen@mr42.org>
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# Copyright: (c) 2025, Christian Siegel <molybdaen@mr42.org>
+# GNU General Public License v3.0+ (see LICENSE or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 - name: "configure | Configure internal OpenSearch users ..."
   ansible.builtin.template:
-    src: etc/opensearch-dashboards/internal_users.yml.j2
-    dest: /etc/opensearch-dashboards/internal_users.yml
+    src: etc/opensearch_dashboards/internal_users.yml.j2
+    dest: /etc/opensearch_dashboards/internal_users.yml
     mode: "0640"
     owner: root
     group: root
@@ -18,8 +18,8 @@
 
 - name: "configure | Configure JVM options for OpenSearch ..."
   ansible.builtin.template:
-    src: etc/opensearch-dashboards/jvm.options.j2
-    dest: /etc/opensearch-dashboards/jvm.options
+    src: etc/opensearch_dashboards/jvm.options.j2
+    dest: /etc/opensearch_dashboards/jvm.options
     mode: "0640"
     owner: root
     group: root
@@ -31,8 +31,8 @@
 
 - name: "configure | Configure OpenSearch base configuration ..."
   ansible.builtin.template:
-    src: etc/opensearch-dashboards/opensearch.yml.j2
-    dest: /etc/opensearch-dashboards/opensearch.yml
+    src: etc/opensearch_dashboards/opensearch.yml.j2
+    dest: /etc/opensearch_dashboards/opensearch.yml
     mode: "0640"
     owner: root
     group: root
@@ -42,4 +42,4 @@
     - opensearch-configure
     - opensearch-configure-opensearch
 
-- name: "configure | Configure "
+#- name: "configure | Configure "

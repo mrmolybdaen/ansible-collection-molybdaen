@@ -7,7 +7,7 @@
 - name: "systemd | Create systemd overrides directory ..."
   ansible.builtin.file:
     state: directory
-    path: /etc/systemd/system/opensearch.service.d
+    path: /etc/systemd/system/opensearch-dashboards.service.d
     mode: "0755"
     owner: root
     group: root
@@ -18,12 +18,12 @@
 
 - name: "systemd | Create systemd overrides configuration file"
   ansible.builtin.copy:
-    src: etc/systemd/system/opensearch.service.d/override.conf
-    dest: /etc/systemd/system/opensearch.service.d/override.conf
+    src: etc/systemd/system/opensearch-dashboards.service.d/override.conf
+    dest: /etc/systemd/system/opensearch-dashboards.service.d/override.conf
     owner: root
     group: root
     mode: "0644"
-  notify: handlers_systemd_unit_restart_opensearch
+  notify: handlers_systemd_unit_restart_opensearch_dashboards
   become: true
   tags:
     - opensearch
