@@ -14,13 +14,13 @@
 #
 # Use a descriptive name for your cluster:
 #
-cluster.name: {{ opensearch_opensearch_yml_cluster_name | default(inventory_hostname) }}
+cluster.name: {{ opensearch_opensearch_yml.cluster_name | default(inventory_hostname) }}
 #
 # ------------------------------------ Node ------------------------------------
 #
 # Use a descriptive name for the node:
 #
-node.name: {{ opensearch_opensearch_yml_node_name | default(inventory_hostname) }}
+node.name: {{ opensearch_opensearch_yml.node_name | default(inventory_hostname) }}
 #
 # Add custom attributes to the node:
 #
@@ -40,7 +40,7 @@ path.logs: /var/log/opensearch
 #
 # Lock the memory on startup:
 #
-bootstrap.memory_lock: {{ opensearch_opensearch_yml_memory_lock | default(true) }}
+bootstrap.memory_lock: {{ opensearch_opensearch_yml.memory_lock | default(true) }}
 #
 # Make sure that the heap size is set to about half the memory available
 # on the system and that the owner of the process is allowed to use this
@@ -52,11 +52,11 @@ bootstrap.memory_lock: {{ opensearch_opensearch_yml_memory_lock | default(true) 
 #
 # Set the bind address to a specific IP (IPv4 or IPv6):
 #
-network.host: {{ opensearch_opensearch_yml_bind_address | default("::1") }}
+network.host: {{ opensearch_opensearch_yml.bind_address | default("::1") }}
 #
 # Set a custom port for HTTP:
 #
-http.port: {{ opensearch_opensearch_yml_http_port | default(9200) }}
+http.port: {{ opensearch_opensearch_yml.http_port | default(9200) }}
 #
 # For more information, consult the network module documentation.
 #
@@ -73,7 +73,7 @@ http.port: {{ opensearch_opensearch_yml_http_port | default(9200) }}
 #
 # For more information, consult the discovery and cluster formation module documentation.
 #
-discovery.type: {{ opensearch_opensearch_yml_discovery_type | default("single-node") }}
+discovery.type: {{ opensearch_opensearch_yml.discovery_type | default("single-node") }}
 # ---------------------------------- Gateway -----------------------------------
 #
 # Block initial recovery after a full cluster restart until N nodes are started:
@@ -90,7 +90,7 @@ action.destructive_requires_name: true
 #
 # ---------------------------------- Remote Store -----------------------------------
 # Controls whether cluster imposes index creation only with remote store enabled
-# cluster.remote_store.enabled: true
+cluster.remote_store.state.enabled: {{ opensearch_opensearch_yml.cluster_remote_store_state | default(true) }}
 #
 # Repository to use for segment upload while enforcing remote store for an index
 # node.attr.remote_store.segment.repository: my-repo-1
@@ -101,35 +101,35 @@ action.destructive_requires_name: true
 # ---------------------------------- Experimental Features -----------------------------------
 # Gates the visibility of the experimental segment replication features until they are production ready.
 #
-#opensearch.experimental.feature.segment_replication_experimental.enabled: false
+#opensearch.experimental.feature.segment_replication_experimental.enabled: {{ opensearch_opensearch_yml.experimental.segment_replication | default(false) }}
 #
 # Gates the functionality of a new parameter to the snapshot restore API
 # that allows for creation of a new index type that searches a snapshot
 # directly in a remote repository without restoring all index data to disk
 # ahead of time.
 #
-#opensearch.experimental.feature.searchable_snapshot.enabled: false
+#opensearch.experimental.feature.searchable_snapshot.enabled: {{ opensearch_opensearch_yml.experimental.searchable_snapshot | default(false) }}
 #
 #
 # Gates the functionality of enabling extensions to work with OpenSearch.
 # This feature enables applications to extend features of OpenSearch outside of
 # the core.
 #
-#pensearch.experimental.feature.extensions.enabled: false
+#opensearch.experimental.feature.extensions.enabled: {{ opensearch_opensearch_yml.experimental.extensions | default(false) }}
 #
 #
 # Gates the optimization of datetime formatters caching along with change in default datetime formatter
 # Once there is no observed impact on performance, this feature flag can be removed.
 #
-#opensearch.experimental.optimization.datetime_formatter_caching.enabled: false
+#opensearch.experimental.optimization.datetime_formatter_caching.enabled: {{ opensearch_opensearch_yml.experimental.datetime_formatter_caching | default(false) }}
 #
 # Gates the functionality of enabling Opensearch to use pluggable caches with respective store names via setting.
 #
-#opensearch.experimental.feature.pluggable.caching.enabled: false
+#opensearch.experimental.feature.pluggable.caching.enabled: {{ opensearch_opensearch_yml.experimental.pluggable_caching | default(false) }}
 #
 # Gates the functionality of star tree index, which improves the performance of search aggregations.
 #
-#opensearch.experimental.feature.composite_index.star_tree.enabled: false
+#opensearch.experimental.feature.composite_index.star_tree.enabled: {{ opensearch_opensearch_yml.experimental.star_tree | default(false) }}
 
 
 # ------------------------ OpenSearch Security common configuration --------------------------
@@ -151,7 +151,6 @@ plugins.security.ssl.http.pemkey_filepath: esnode-key.pem
 plugins.security.ssl.http.pemtrustedcas_filepath: root-ca.pem
 plugins.security.allow_unsafe_democertificates: true
 plugins.security.authcz.admin_dn: ['CN=kirk,OU=client,O=client,L=test,C=de']
-plugins.security.check_snapshot_restore_write_privileges: true
 plugins.security.system_indices.enabled: true
 plugins.security.system_indices.indices: [.plugins-ml-agent, .plugins-ml-config, .plugins-ml-connector,
   .plugins-ml-controller, .plugins-ml-model-group, .plugins-ml-model, .plugins-ml-task,

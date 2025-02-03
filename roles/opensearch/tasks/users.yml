@@ -1,4 +1,79 @@
 ---
 
-# Copyright: (c) 2024, Christian Siegel <molybdaen@mr42.org>
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# Copyright: (c) 2025, Christian Siegel <molybdaen@mr42.org>
+# GNU General Public License v3.0+ (see LICENSE or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+- name: "users | Create action groups ..."
+  ansible.builtin.uri:
+    url: "{{ opensearch_url | default('https://localhost:9200') }}/_plugins/_security/api/actiongroups/{{ opensearch_actiongroup.name }}"
+    url_username: "{{ opensearch_admin_user }}"
+    url_password: "{{ opensearch_admin_password }}"
+    method: "{{ opensearch_user.method | default('PUT') }}"
+    validate_certs: "{{ opensearch_validate_certs | default(true) }}"
+    body_format: json
+    status_code:
+      - 200
+      - 201
+      - 202
+    body:
+      allowed_actions: "{{ opensearch_actiongroup.actions | default([]) }}"
+  loop: "{{ opensearch_api_actiongroups | default([]) }}"
+  loop_control:
+    index_var: opensearch_actiongroup_index
+    loop_var: opensearch_actiongroup
+  tags:
+    - opensearch
+    - opensearch-users
+    - opensearch-actiongroups
+
+- name: "users | Create custom roles ..."
+  ansible.builtin.uri:
+    url: "{{ opensearch_url | default('https://localhost:9200') }}/_plugins/_security/api/roles/{{ opensearch_role.name }}"
+    url_username: "{{ opensearch_admin_user }}"
+    url_password: "{{ opensearch_admin_password }}"
+    method: "{{ opensearch_user.method | default('PUT') }}"
+    validate_certs: "{{ opensearch_validate_certs | default(true) }}"
+    body_format: json
+    status_code:
+      - 200
+      - 201
+      - 202
+    body:
+      cluster_permissions: "{{ opensearch_role.cluster_permissions }}"
+      index_permissions: "{{ opensearch_role.index_permissions }}"
+      tenant_permissions: "{{ opensearch_role.tenant_permissions }}"
+  loop: "{{ opensearch_api_roles | default([]) }}"
+  loop_control:
+    index_var: opensearch_role_index
+    loop_var: opensearch_role
+  tags:
+    - opensearch
+    - opensearch-users
+    - opensearch-roles
+
+- name: "users | Create user with permissions ..."
+  ansible.builtin.uri:
+    url: "{{ opensearch_url | default('https://localhost:9200') }}/plugins/_security/api/internalusers/{{ opensearch_user.name }}"
+    url_username: "{{ opensearch_admin_user }}"
+    url_password: "{{ opensearch_admin_password }}"
+    method: "{{ opensearch_user.method | default('PUT') }}"
+    validate_certs: "{{ opensearch_validate_certs | default(true) }}"
+    body_format: json
+    status_code:
+      - 200
+      - 201
+      - 202
+    body:
+      # TODO: We currently use password. However, in a future release this might switch to hash.
+      password: "{{ opensearch_user.password }}"
+      opendistro_security_roles: "{{ opensearch_user.security_roles | default([]) }}"
+      backend_roles: "{{ opensearch_user.backend_roles | default([]) }}"
+      attributes: "{{ opensearch_user.attributes | default({}) }}"
+  no_log: true
+  loop: "{{ opensearch_api_users | default([]) }}"
+  loop_control:
+    index_var: opensearch_user_index
+    loop_var: opensearch_user
+  tags:
+    - opensearch
+    - opensearch-users

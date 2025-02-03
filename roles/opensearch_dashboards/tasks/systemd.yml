@@ -3,6 +3,7 @@
 # Copyright: (c) 2025, Christian Siegel <molybdaen@mr42.org>
 # GNU General Public License v3.0+ (see LICENSE or https://www.gnu.org/licenses/gpl-3.0.txt)
 
+
 - name: "systemd | Create systemd overrides directory ..."
   ansible.builtin.file:
     state: directory
@@ -15,7 +16,7 @@
     - opensearch
     - opensearch-systemd
 
-- name: "systemd | Create systemd overrides configuration file ..."
+- name: "systemd | Create systemd overrides configuration file"
   ansible.builtin.copy:
     src: etc/systemd/system/opensearch.service.d/override.conf
     dest: /etc/systemd/system/opensearch.service.d/override.conf
@@ -24,12 +25,6 @@
     mode: "0644"
   notify: handlers_systemd_unit_restart_opensearch
   become: true
-  tags:
-    - opensearch
-    - opensearch-systemd
-
-- name: "systemd | Flush handlers"
-  ansible.builtin.meta: flush_handlers
   tags:
     - opensearch
     - opensearch-systemd

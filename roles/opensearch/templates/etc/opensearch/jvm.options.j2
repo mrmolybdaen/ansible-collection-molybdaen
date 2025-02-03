@@ -19,8 +19,8 @@
 # Xms represents the initial size of total heap space
 # Xmx represents the maximum size of total heap space
 
--Xms{{ opensearch_jvm_options_xms_value | default(ansible_facts['memtotal_mb']/2 | int) }}m
--Xmx{{ opensearch_jvm_options_xmx_value | default(ansible_facts['memtotal_mb']/2 | int) }}m
+-Xms{{ opensearch_jvm_options_xms_value | default(ansible_facts['memtotal_mb']//2 | int) }}m
+-Xmx{{ opensearch_jvm_options_xmx_value | default(ansible_facts['memtotal_mb']//2 | int) }}m
 
 ################################################################
 ## Expert settings

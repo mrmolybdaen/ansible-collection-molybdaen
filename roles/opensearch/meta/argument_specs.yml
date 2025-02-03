@@ -1,7 +1,7 @@
 ---
 
-# Copyright: (c) 2024, Christian Siegel <molybdaen@mr42.org>
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# Copyright: (c) 2025, Christian Siegel <molybdaen@mr42.org>
+# GNU General Public License v3.0+ (see LICENSE or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 argument_specs:
   main:
@@ -11,4 +11,217 @@ argument_specs:
       - Configure OpenSearch with admin user, management user and log index user
       - By default configure single node mode.
     author: Christian Siegel
-    #options:
+    options:
+      opensearch_validate_certs:
+        type: "bool"
+        required: false
+        default: true
+        description:
+          - "Enable or disable certificate validation for API calls done by this script."
+      opensearch_version:
+        type: "str"
+        required: false
+        default: "2.x"
+        description:
+          - "OpenSearch version branch"
+      opensearch_admin_password:
+        type: "str"
+        required: true
+        description:
+          - "This is the OpenSearch admin password."
+      opensearch_admin_user:
+        type: "str"
+        required: false
+        default: "admin"
+        description:
+          - "This is the username of the OpenSearch administrative user."
+      opensearch_api_actiongroups:
+        type: "list"
+        elements: "dict"
+        required: false
+        default: []
+        description:
+          - "List of dictionary containing action group names and list of actions"
+        options:
+          name:
+            type: "str"
+            required: true
+            description:
+              - "Name of the action group"
+          allowed_actions:
+            type: "list"
+            elements: "str"
+            required: true
+            description:
+              - "List of actions"
+              - "For example C('indices:data/write/index*')"
+      opensearch_api_roles:
+        type: "list"
+        required: false
+        default: []
+        elements: "dict"
+        description:
+          - "List of dictionaries of custom roles and their permissions to create"
+        options:
+          name:
+            type: "str"
+            required: true
+            description:
+              - "Name of the role."
+          cluster_permissions:
+            type: "list"
+            elements: "str"
+            required: false
+            description:
+              - "List of cluster wide permissions for the api role"
+          index_permissions:
+            type: "list"
+            elements: "str"
+            required: false
+            description:
+              - "List of index permissions for the api role"
+          tenant_permissions:
+            type: "list"
+            elements: "str"
+            required: false
+            description:
+              - "List of tenant permissions for the api role"
+      opensearch_api_users:
+        type: "list"
+        required: false
+        elements: "dict"
+        default: []
+        description:
+          - "List of dictionaries of users to create."
+        options:
+          name:
+            type: "str"
+            required: true
+            description: "User name"
+          password:
+            type: "str"
+            required: true
+            description: "User password"
+          opendistro_security_roles:
+            type: "list"
+            elements: "str"
+            required: false
+            default: []
+            description:
+              - "List of security roles."
+              - "Note, all roles you add here must already exist when creating the user."
+          backend_roles:
+            type: "list"
+            elements: "str"
+            required: false
+            default: []
+            description:
+              - "List of backend roles of a third party authentication service"
+          attributes:
+            type: "dict"
+            required: false
+            default: {}
+            description:
+              - "Attributes as key-value pairs."
+      opensearch_init_admin_password:
+        type: "str"
+        required: false
+        default: "{{ opensearch_admin_password }}"
+        description:
+          - "Set the admin password used for initialization."
+          - "This value should only differ from C(opensearch_admin_password) when one wants to change the admin password"
+      opensearch_opensearch_yml:
+        type: "dict"
+        required: false
+        description:
+          - "This dictionary contains all configuration directives for opensearch.yml"
+        options:
+          bind_address:
+            type: "str"
+            required: false
+            default: "::1"
+            description:
+              - "Address OpenSearch will bind to."
+          cluster_name:
+            type: "str"
+            required: false
+            description:
+              - "Name of the opensearch cluster"
+          cluster_remote_store:
+            type: "bool"
+            required: false
+            default: true
+            description:
+              - "Controls whether cluster imposes index creation only with remote store enabled"
+          discovery_type:
+            type: "str"
+            choices:
+              - "single-node"
+              - "multi-node"
+            description:
+              - "By default, OpenSearch starts in multi-node mode, we invert this behavior and configure single-node as default."
+          experimental:
+            type: "dict"
+            required: false
+            description:
+              - "Enable experimental features."
+              - "By default all experimental features are disabled."
+          http_port:
+            type: "int"
+            required: false
+            default: 9200
+            description:
+              - "Public HTTP port OpenSearch will bind to."
+          memory_lock:
+            type: "bool"
+            required: false
+            description:
+              - "Disable or enable memlock and swap."
+              - "Swap might decrease performance."
+          node_name:
+            type: "str"
+            required: false
+            description:
+              - "Name of the cluster node"
+      opensearch_whitelist_ipv4:
+        type: "dict"
+        required: false
+        description:
+          - "Define cluster node and client IP addresses allowed in nftables"
+        options:
+          clients:
+            type: "list"
+            elements: "str"
+            required: false
+            default: []
+            description:
+              - "Define client ip addresses allowed for port 9200."
+              - "This should include the Kibana/OpenSearch Dashboards node."
+          nodes:
+            type: "list"
+            elements: "str"
+            required: false
+            default: []
+            description:
+              - "Define cluster node ip addresses allowed for port 9300."
+      opensearch_whitelist_ipv6:
+        type: "dict"
+        required: false
+        description:
+          - "Define cluster node and client IP addresses allowed in nftables"
+        options:
+          clients:
+            type: "list"
+            elements: "str"
+            required: false
+            default: []
+            description:
+              - "Define client ip addresses allowed for port 9200."
+              - "This should include the Kibana/OpenSearch Dashboards node."
+          nodes:
+            type: "list"
+            elements: "str"
+            required: false
+            default: []
+            description:
+              - "Define cluster node ip addresses allowed for port 9300."

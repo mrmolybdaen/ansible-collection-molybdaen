@@ -1,7 +1,7 @@
 ---
 
-# Copyright: (c) 2024, Christian Siegel <molybdaen@mr42.org>
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# Copyright: (c) 2025, Christian Siegel <molybdaen@mr42.org>
+# GNU General Public License v3.0+ (see LICENSE or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 
 - name: "configure | Configure internal OpenSearch users ..."
@@ -10,7 +10,7 @@
     dest: /etc/opensearch/internal_users.yml
     mode: "0640"
     owner: root
-    group: root
+    group: opensearch
   notify: handlers_systemd_unit_restart_opensearch
   become: true
   tags:
@@ -24,7 +24,7 @@
     dest: /etc/opensearch/jvm.options
     mode: "0640"
     owner: root
-    group: root
+    group: opensearch
   notify: handlers_systemd_unit_restart_opensearch
   become: true
   tags:
@@ -38,7 +38,7 @@
     dest: /etc/opensearch/opensearch.yml
     mode: "0640"
     owner: root
-    group: root
+    group: opensearch
   notify: handlers_systemd_unit_restart_opensearch
   become: true
   tags:
