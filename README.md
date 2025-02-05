@@ -31,6 +31,8 @@ Collection documentation can be found here:
 
 This role depends on several different Python modules which do not come with the `ansible` or `ansible-core` packages.
 - netaddr
+- bcrypt
+- passlib
 
 ## Default values
 
@@ -56,5 +58,5 @@ pip install pre-commit
 pre-commit install
 ```
 
-Talking about pipelines, we run sanity, unit and integration tests in a pre-build phase as well as syntax checks and dry-runs 
+Talking about pipelines, we run sanity, unit and integration tests in a pre-build phase as well as syntax checks and dry-runs
 and actual deployments in a post-build stage.

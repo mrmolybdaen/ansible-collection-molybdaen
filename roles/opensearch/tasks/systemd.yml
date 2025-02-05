@@ -33,3 +33,31 @@
   tags:
     - opensearch
     - opensearch-systemd
+    - opensearch-configuration*
+
+- name: "systemd | Wait a short time for OpenSearch to restart ..."
+  ansible.builtin.pause:
+    seconds: 10
+  tags:
+    - opensearch
+    - opensearch-systemd
+    - opensearch-configuration*
+
+- name: "systemd | Check if OpenSearch is running again, retry 10 times ..."
+  ansible.builtin.uri:
+    url: "{{ opensearch_url | default('https://localhost:9200') }}/_list/indices"
+    url_password: "{{ opensearch_admin_password }}"
+    url_username: "{{ opensearch_admin_user }}"
+    validate_certs: "{{ opensearch_validate_certs | default(true) }}"
+    status_code:
+      - 200
+      - 301
+      - 302
+    register: opensearch_systemd_wait_until_api_is_ok
+    until: "opensearch_systemd_wait_until_api_is_ok.status in [200, 301, 302]"
+    retries: 10
+    delay: 10
+    tags:
+      - opensearch
+      - opensearch-systemd
+      - opensearch-configuration*
