@@ -12,3 +12,10 @@
     daemon_reload: true
   become: true
   listen: handlers_systemd_unit_restart_opensearch
+
+
+- name: "Update security configuration ..."
+  ansible.builtin.command:
+    cmd: /usr/share/opensearch/plugins/opensearch-security/tools/securityadmin.sh
+  become: true
+  listen: handlers_opensearch_securityadmin

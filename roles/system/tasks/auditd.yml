@@ -1,0 +1,134 @@
+---
+
+# Copyright: (c) 2025, Christian Siegel <molybdaen@mr42.org>
+# GNU General Public License v3.0+ (see LICENSE or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+- name: "auditd | Install auditd packages ..."
+  ansible.builtin.apt:
+    state: present
+    name:
+    - auditd
+    - audispd-plugins
+  become: true
+  tags:
+    - system
+    - system-auditd
+    - system-security
+
+- name: "auditd | Copy rulesets ..."
+  tags:
+    - system
+    - system-auditd
+    - system-security
+  become: true
+  block:
+    - name: "auditd | Copy main config file ..."
+      ansible.builtin.copy:
+        src: audit/auditd.conf
+        dest: /etc/audit/auditd.conf
+        mode: "0640"
+        owner: root
+        group: root
+        backup: true
+      register: system_auditd_conf_main
+
+    - name: "auditd | Remove maintainer audit.rules"
+      ansible.builtin.file:
+        state: absent
+        path: /etc/audit/rules.d/audit.rules
+
+    - name: "auditd | Copy rulesets ..."
+      ansible.builtin.copy:
+        src: "audit/{{ system_auditd_ruleset_files }}.rules"
+        dest: "/etc/audit/rules.d/{{ system_auditd_ruleset_files }}.rules"
+        mode: "0640"
+        owner: root
+        group: root
+        backup: true
+      register: system_auditd_conf_rulesets
+      loop_control:
+        loop_var: system_auditd_ruleset_files
+      loop:
+        - 00-audit
+        - 90-access
+        - 90-clock
+        - 90-file-perms
+        - 90-identity
+        - 90-logins
+        - 90-sudo
+        - 90-sudoers
+        - 90-system-locale
+        - 99-finalize
+
+    - name: "auditd | Check if rules where applied ..."
+      ansible.builtin.command: "/usr/sbin/augenrules --check"
+      register: system_auditd_augenrules_check
+      changed_when: system_auditd_augenrules_check.rc == 0
+      failed_when: system_auditd_augenrules_check.rc > 0
+
+    - name: "auditd | Reboot on changes ..."
+      when: "'Rules have changed and should be updated' in system_auditd_augenrules_check.stdout"
+      ansible.builtin.reboot:
+        pre_reboot_delay: 30
+        post_reboot_delay: 15
+        reboot_timeout: 600
+        msg: "ansible | auditd | Rules changed, system will reboot in 30s to apply them."
+  rescue:
+    - name: "auditd | Rescue | Restore last configuration state ..."
+      when: system_auditd_conf_main.backup_file is defined
+      ansible.builtin.copy:
+        src: "{{ system_auditd_conf_main.backup_file }}"
+        dest: "{{ system_auditd_conf_main.dest }}"
+        mode: "0640"
+        owner: root
+        group: root
+        remote_src: true
+
+    - name: "auditd | Rescue | Restore last configuration state ..."
+      when: system_auditd_file_config.backup_file is defined
+      ansible.builtin.copy:
+        src: "{{ system_auditd_file_config.backup_file }}"
+        dest: "{{ system_auditd_file_config.dest }}"
+        mode: "0644"
+        owner: root
+        group: root
+        remote_src: true
+      loop_control:
+        loop_var: system_auditd_file_config
+      loop: "{{ system_auditd_conf_rulesets }}"
+
+
+- name: "auditd | Enable and start auditd ..."
+  ansible.builtin.systemd_service:
+    daemon_reload: true
+    state: restarted
+    enabled: true
+    name: auditd.service
+  become: true
+  tags:
+    - system
+    - system-auditd
+    - system-security
+
+# Cleanup
+- name: "auditd | Cleanup block ..."
+  tags:
+    - system
+    - system-auditd
+    - system-security
+  become: true
+  block:
+    - name: "auditd | Cleanup ansible backup files ..."
+      when: system_auditd_conf_main.backup_file is defined
+      ansible.builtin.file:
+        state: absent
+        path: "{{ system_auditd_conf_main.backup_file }}"
+
+    - name: "auditd | Cleanup ansible backup files ..."
+      when: system_auditd_file_config.backup_file is defined
+      ansible.builtin.file:
+        state: absent
+        path: "{{ system_auditd_file_config.backup_file }}"
+      loop_control:
+        loop_var: system_auditd_file_config
+      loop: "{{ system_auditd_conf_rulesets.results }}"

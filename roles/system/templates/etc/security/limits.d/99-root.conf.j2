@@ -1,0 +1,9 @@
+#/etc/security/limits.d/99-root.conf
+# This file contains overall system defaults for the root user.
+# It is possible add limits in another confiugration if needed by
+# an application.
+
+#domain     type    item            value
+
+root        soft    nofile          65536
+root        hard    nofile          65536

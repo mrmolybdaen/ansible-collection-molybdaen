@@ -39,9 +39,9 @@
       - 201
       - 202
     body:
-      cluster_permissions: "{{ opensearch_role.cluster_permissions }}"
-      index_permissions: "{{ opensearch_role.index_permissions }}"
-      tenant_permissions: "{{ opensearch_role.tenant_permissions }}"
+      cluster_permissions: "{{ opensearch_role.cluster_permissions | default(omit) }}"
+      index_permissions: "{{ opensearch_role.index_permissions | default(omit) }}"
+      tenant_permissions: "{{ opensearch_role.tenant_permissions | default(omit) }}"
   loop: "{{ opensearch_api_roles | default([]) }}"
   loop_control:
     index_var: opensearch_role_index
@@ -64,8 +64,11 @@
       - 201
       - 202
     body:
-      # TODO: We currently use password. However, in a future release this might switch to hash.
-      password: "{{ opensearch_user.password }}"
+      # An alternative to hash would be password. Using password would hash the password by OpenSearch
+      # However, leaking a hash in a log leaves enough time to change the password before someone can
+      # decrypt the hash.
+      # OpenSearch currently uses Bcrypt for hashing.
+      hash: "{{ opensearch_user.password | ansible.builtin.password_hash(hashtype='bcrypt')}}"
       opendistro_security_roles: "{{ opensearch_user.security_roles | default([]) }}"
       backend_roles: "{{ opensearch_user.backend_roles | default([]) }}"
       attributes: "{{ opensearch_user.attributes | default({}) }}"

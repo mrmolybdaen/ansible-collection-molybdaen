@@ -1,0 +1,42 @@
+---
+
+# Copyright: (c) 2025, Christian Siegel <molybdaen@mr42.org>
+# GNU General Public License v3.0+ (see LICENSE or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+# /etc/sysctl.d/99-sysctl.conf is a symlink to /etc/sysctl.conf
+- name: "sysctl | Copy our own systcl.conf"
+  ansible.builtin.template:
+    owner: root
+    group: root
+    mode: "0644"
+    src: "etc/sysctl.d/{{ sysctl_file }}.conf"
+    dest: "/etc/sysctl.d/{{ sysctl_file }}.conf"
+  loop_control:
+    loop_var: sysctl_file
+  loop:
+    - "10-bufferbloat"
+    - "10-filesystem"
+    - "10-kernel"
+    - "10-networking"
+    - "10-virtual-memory"
+  become: true
+  tags:
+    - sysctl
+    - system
+    - system-security
+    - system-sysctl
+    - base
+    - security
+
+- name: "sysctl | Reload configurations without rebooting"
+  ansible.builtin.command: /usr/sbin/sysctl --system
+  register: system_sysctl_update
+  changed_when: system_sysctl_update.rc == 0
+  become: true
+  tags:
+    - sysctl
+    - system
+    - system-security
+    - system-sysctl
+    - base
+    - security
