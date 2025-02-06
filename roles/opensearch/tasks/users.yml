@@ -53,7 +53,7 @@
 
 - name: "users | Create user with permissions ..."
   ansible.builtin.uri:
-    url: "{{ opensearch_url | default('https://localhost:9200') }}/plugins/_security/api/internalusers/{{ opensearch_user.name }}"
+    url: "{{ opensearch_url | default('https://localhost:9200') }}/_plugins/_security/api/internalusers/{{ opensearch_user.name }}"
     url_username: "{{ opensearch_admin_user }}"
     url_password: "{{ opensearch_admin_password }}"
     method: "{{ opensearch_user.method | default('PUT') }}"
@@ -69,14 +69,42 @@
       # decrypt the hash.
       # OpenSearch currently uses Bcrypt for hashing.
       hash: "{{ opensearch_user.password | ansible.builtin.password_hash(hashtype='bcrypt')}}"
-      opendistro_security_roles: "{{ opensearch_user.security_roles | default([]) }}"
-      backend_roles: "{{ opensearch_user.backend_roles | default([]) }}"
-      attributes: "{{ opensearch_user.attributes | default({}) }}"
+      opendistro_security_roles: "{{ opensearch_user.security_roles | default(omit) }}"
+      backend_roles: "{{ opensearch_user.backend_roles | default(omit) }}"
+      attributes: "{{ opensearch_user.attributes | default(omit) }}"
   no_log: true
   loop: "{{ opensearch_api_users | default([]) }}"
   loop_control:
     index_var: opensearch_user_index
     loop_var: opensearch_user
+  tags:
+    - opensearch
+    - opensearch-users
+
+- name: "users | Create or update role mappings ..."
+  ansible.builtin.uri:
+    url: "{{ opensearch_url | default('https://localhost:9200') }}/_plugins/_security/api/rolesmapping/{{ opensearch_rolesmapping.name }}"
+    url_username: "{{ opensearch_admin_user }}"
+    url_password: "{{ opensearch_admin_password }}"
+    method: "{{ opensearch_user.method | default('PUT') }}"
+    validate_certs: "{{ opensearch_validate_certs | default(true) }}"
+    body_format: json
+    status_code:
+      - 200
+      - 201
+      - 202
+    body:
+      # An alternative to hash would be password. Using password would hash the password by OpenSearch
+      # However, leaking a hash in a log leaves enough time to change the password before someone can
+      # decrypt the hash.
+      # OpenSearch currently uses Bcrypt for hashing.
+      backend_roles: "{{ opensearch_rolesmapping.backend_roles | default(omit) }}"
+      hosts: "{{ opensearch_rolesmapping.hosts | default(['*']) }}"
+      users: "{{ opensearch_rolesmapping.users | default(omit) }}"
+  loop: "{{ opensearch_api_rolesmappings | default([]) }}"
+  loop_control:
+    index_var: opensearch_rolesmapping_index
+    loop_var: opensearch_rolesmapping
   tags:
     - opensearch
     - opensearch-users
