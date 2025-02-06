@@ -53,11 +53,11 @@
       - 200
       - 301
       - 302
-    register: opensearch_systemd_wait_until_api_is_ok
-    until: "opensearch_systemd_wait_until_api_is_ok.status in [200, 301, 302]"
-    retries: 10
-    delay: 10
-    tags:
-      - opensearch
-      - opensearch-systemd
-      - opensearch-configuration*
+  register: opensearch_systemd_wait_until_api_is_ok
+  until: "opensearch_systemd_wait_until_api_is_ok.status in [200, 301, 302]"
+  retries: 10
+  delay: 10
+  tags:
+    - opensearch
+    - opensearch-systemd
+    - opensearch-configuration*
