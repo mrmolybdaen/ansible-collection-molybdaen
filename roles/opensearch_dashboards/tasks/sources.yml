@@ -12,9 +12,9 @@
       - curl
   become: true
   tags:
-    - opensearch_dashboards
-    - opensearch_dashboards-sources
-    - opensearch_dashboards-sources-apt
+    - opensearch-dashboards
+    - opensearch-dashboards-sources
+    - opensearch-dashboards-sources-apt
 
 - name: "sources | Get and install repository key ..."
   ansible.builtin.deb822_repository:
@@ -26,16 +26,16 @@
     signed_by: "https://artifacts.opensearch.org/publickeys/opensearch.pgp"
   become: true
   tags:
-    - opensearch_dashboards
-    - opensearch_dashboards-sources
-    - opensearch_dashboards-sources-list
+    - opensearch-dashboards
+    - opensearch-dashboards-sources
+    - opensearch-dashboards-sources-list
 
 - name: "sources | Update repository cache ..."
   ansible.builtin.apt:
     update_cache: true
   become: true
   tags:
-    - opensearch_dashboards
-    - opensearch_dashboards-dashboards-sources
-    - opensearch_dashboards-dashboards-sources-list
-    - opensearch_dashboards-dashboards-sources-key
+    - opensearch-dashboards
+    - opensearch-dashboards-dashboards-sources
+    - opensearch-dashboards-dashboards-sources-list
+    - opensearch-dashboards-dashboards-sources-key

@@ -3,7 +3,7 @@
 # Copyright: (c) 2025, Christian Siegel <molybdaen@mr42.org>
 # GNU General Public License v3.0+ (see LICENSE or https://www.gnu.org/licenses/gpl-3.0.txt)
 
-- name: "configure | Configure internal OpenSearch users ..."
+- name: "configure | Configure OpenSearch Dashboards ..."
   ansible.builtin.template:
     src: etc/opensearch_dashboards/internal_users.yml.j2
     dest: /etc/opensearch_dashboards/internal_users.yml
@@ -12,34 +12,18 @@
     group: root
   notify: handlers_opensearch_dashboards_restart
   tags:
-    - opensearch
-    - opensearch-configure
-    - opensearch-configure-internal_users
+    - opensearch-dashboards
+    - opensearch-dashboards-configure
 
-- name: "configure | Configure JVM options for OpenSearch ..."
+- name: "configure | Configure Node options for OpenSearch Dashboards ..."
   ansible.builtin.template:
-    src: etc/opensearch_dashboards/jvm.options.j2
-    dest: /etc/opensearch_dashboards/jvm.options
+    src: etc/opensearch_dashboards/node.options.j2
+    dest: /etc/opensearch_dashboards/node.options
     mode: "0640"
     owner: root
     group: root
   notify: handlers_opensearch_restart
   tags:
-    - opensearch
-    - opensearch-configure
-    - opensearch-configure-jvm
-
-- name: "configure | Configure OpenSearch base configuration ..."
-  ansible.builtin.template:
-    src: etc/opensearch_dashboards/opensearch.yml.j2
-    dest: /etc/opensearch_dashboards/opensearch.yml
-    mode: "0640"
-    owner: root
-    group: root
-  notify: handlers_opensearch_restart
-  tags:
-    - opensearch
-    - opensearch-configure
-    - opensearch-configure-opensearch
-
-#- name: "configure | Configure "
+    - opensearch-dashboards
+    - opensearch-dashboards-configure
+    - opensearch-dashboards-configure-node

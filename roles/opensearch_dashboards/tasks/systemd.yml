@@ -13,8 +13,8 @@
     group: root
   become: true
   tags:
-    - opensearch
-    - opensearch-systemd
+    - opensearch-dashboards
+    - opensearch-dashboards-systemd
 
 - name: "systemd | Create systemd overrides configuration file"
   ansible.builtin.copy:
@@ -26,5 +26,5 @@
   notify: handlers_systemd_unit_restart_opensearch_dashboards
   become: true
   tags:
-    - opensearch
-    - opensearch-systemd
+    - opensearch-dashboards
+    - opensearch-dashboards-systemd

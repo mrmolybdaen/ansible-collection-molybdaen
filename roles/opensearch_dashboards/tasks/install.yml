@@ -9,4 +9,7 @@
     state: present
     name: opensearch-dashboards
     force_apt_get: true
-  no_log: true
+  become: true
+  tags:
+    - opensearch-dashboards
+    - opensearch-dashboards-install

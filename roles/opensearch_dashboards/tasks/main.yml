@@ -3,6 +3,14 @@
 # Copyright: (c) 2025, Christian Siegel <molybdaen@mr42.org>
 # GNU General Public License v3.0+ (see LICENSE or https://www.gnu.org/licenses/gpl-3.0.txt)
 
+- name: "Import user creation tasks from mrmolybdaen.molybdaen.opensearch role ..."
+  ansible.builtin.import_role:
+    name: "mrmolybdaen.molybdaen.opensearch"
+    tasks_from: "users"
+  tags:
+    - opensearch-dashboards
+    - opensearch-dashboards-users
+
 - name: "Import sources list configuration tasks ..."
   ansible.builtin.import: "sources.yml"
   tags:
@@ -26,9 +34,3 @@
   tags:
     - opensearch-dashboards
     - opensearch-dashboards-config
-
-- name: "Import OpenSearch user configuration ..."
-  ansible.builtin.import: "users.yml"
-  tags:
-    - opensearch-dashboards
-    - opensearch-dashboards-users
