@@ -5,7 +5,7 @@
 
 - name: "Install OpenSearch Dashboards"
   hosts:
-    - opensearch
+    - dashboard_nodes
   roles:
     - mrmolybdaen.molybdaen.nftables
     - mrmolybdaen.molybdaen.openssh
