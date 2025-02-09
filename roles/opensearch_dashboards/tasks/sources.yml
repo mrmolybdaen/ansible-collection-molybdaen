@@ -22,7 +22,7 @@
     types: deb
     suites: stable
     components: main
-    uris: "https://artifacts.opensearch.org/releases/bundle/opensearch-dashboards/{{ opensearch_dashboards_version | default('2.x') }}/apt"
+    uris: "https://artifacts.opensearch.org/releases/bundle/opensearch-dashboards/{{ opensearch_dashboards.version | default('2.x') }}/apt"
     signed_by: "https://artifacts.opensearch.org/publickeys/opensearch.pgp"
   become: true
   tags:
