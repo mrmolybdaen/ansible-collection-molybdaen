@@ -8,7 +8,7 @@ set opensearch-dashboards-v4-acl {
     flags interval
     elements = {
         127.0.0.0/16,
-{% for ip in opensearch_dashboards.nftables.whitelist_ipv4 | default([]) if opensearch_dashboards.nftables.whitelist_ipv4 is defined and opensearch_whitelist_ipv4.clients|length %}
+{% for ip in opensearch_dashboards.nftables.whitelist_ipv4 | default([]) %}
         {{ ip }}{{ "," if loop.last }}
 {% endfor %}
     }
@@ -20,7 +20,7 @@ set opensearch-dashboards-v6-acl {
     flags interval
     elements = {
         ::1,
-{% for ip in opensearch_dashboards.nftables.whitelist_ipv6 if opensearch_dashboards.nftables.whitelist_ipv6 is defined and opensearch_dashboards.nftables.whitelist_ipv6|length %}
+{% for ip in opensearch_dashboards.nftables.whitelist_ipv6 | default([]) %}
         {{ ip }}{{ "," if loop.last }}
 {% endfor %}
     }
