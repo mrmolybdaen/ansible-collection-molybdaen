@@ -12,3 +12,7 @@
   environment:
     OPENSEARCH_INITIAL_ADMIN_PASSWORD: "{{ opensearch_init_admin_password }}"
   no_log: true
+  become: true
+  tags:
+    - opensearch
+    - opensearch-install
