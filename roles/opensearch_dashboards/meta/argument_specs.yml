@@ -48,11 +48,8 @@ argument_specs:
                 description:
                   - "Set a custom base path. This cannot end in a slash!"
               rewrite_base_path:
-                type: "str"
+                type: "bool"
                 required: false
-                choices:
-                  - "true"
-                  - "false"
                 description:
                   - "Specify whether to rewrite requests prefixed with the base path will be rewritten by the Dashboards or a reverse proxy."
               max_payload_bytes:
