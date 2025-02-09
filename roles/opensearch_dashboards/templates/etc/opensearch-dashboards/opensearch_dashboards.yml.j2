@@ -120,7 +120,7 @@ opensearch.shardTimeout: {{ opensearch_dashboards.opensearch.timeout.shard | def
 # opensearch.logQueries: false
 
 # Specifies the path where OpenSearch Dashboards creates the process ID file.
-pid.file: {{ opensearch_dashboards.pid_file | default("/var/run/opensearchDashboards.pid") }}
+pid.file: {{ opensearch_dashboards.pid_file | default("/var/run/opensearch-dashboards/opensearchDashboards.pid") }}
 
 # Enables you to specify a file where OpenSearch Dashboards stores log output.
 logging.dest: {{ opensearch_dashboards.log_file | default("stdout") }}
