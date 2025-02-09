@@ -6,31 +6,31 @@
 # Default configuration for OpenSearch Dashboards
 
 # OpenSearch Dashboards is served by a back end server. This setting specifies the port to use.
-server.port: {{ opensearch_dashboards_server.port | default(5601) }}
+server.port: {{ opensearch_dashboards.server.port | default(5601) }}
 
 # Specifies the address to which the OpenSearch Dashboards server will bind. IP addresses and host names are both valid values.
 # The default is 'localhost', which usually means remote machines will not be able to connect.
 # To allow connections from remote users, set this parameter to a non-loopback address.
-server.host: "{{ opensearch_dashboards_server.host | default('localhost') }}"
+server.host: "{{ opensearch_dashboards.server.host | default('localhost') }}"
 
 # Enables you to specify a path to mount OpenSearch Dashboards at if you are running behind a proxy.
 # Use the `server.rewriteBasePath` setting to tell OpenSearch Dashboards if it should remove the basePath
 # from requests it receives, and to prevent a deprecation warning at startup.
 # This setting cannot end in a slash.
-server.basePath: "{{ opensearch_dashboards_server.base_path | default('') }}"
+server.basePath: "{{ opensearch_dashboards.server.base_path | default('') }}"
 
 # Specifies whether OpenSearch Dashboards should rewrite requests that are prefixed with
 # `server.basePath` or require that they are rewritten by your reverse proxy.
-server.rewriteBasePath: {{ opensearch_dashboards_server.rewrite_base_path | default('false') }}
+server.rewriteBasePath: {{ opensearch_dashboards.server.rewrite_base_path | default('false') }}
 
 # The maximum payload size in bytes for incoming server requests.
-server.maxPayloadBytes: {{ opensearch_dashboards_server.max_payload_bytes | default(10485760) }}
+server.maxPayloadBytes: {{ opensearch_dashboards.server.max_payload_bytes | default(10485760) }}
 
 # The OpenSearch Dashboards server's name.  This is used for display purposes.
-server.name: "{{ opensearch_dashboards_server.name | default(inventory_hostname) }}"
+server.name: "{{ opensearch_dashboards.server.name | default(inventory_hostname) }}"
 
 # The URLs of the OpenSearch instances to use for all your queries.
-opensearch.hosts: {{ opensearch_dashboards.dashboards.opensearch_instance_list | default(["http://localhost:9200"]) }}
+opensearch.hosts: {{ opensearch_dashboards.opensearch.instance_list | default(["http://localhost:9200"]) }}
 
 # OpenSearch Dashboards uses an index in OpenSearch to store saved searches, visualizations and
 # dashboards. OpenSearch Dashboards creates a new index if the index doesn't already exist.
@@ -84,31 +84,34 @@ opensearch.ssl.verificationMode: {{ opensearch_dashboards.opensearch.ssl.verific
 
 # Time in milliseconds to wait for OpenSearch to respond to pings. Defaults to the value of
 # the opensearch.requestTimeout setting.
-# opensearch.pingTimeout: 1500
+opensearch.pingTimeout: {{ opensearch_dashboards.opensearch.timeout_ping | default(1500) }}
 
 # Time in milliseconds to wait for responses from the back end or OpenSearch. This value
 # must be a positive integer.
-# opensearch.requestTimeout: 30000
+opensearch.requestTimeout: {{ opensearch_dashboards.opensearch.timeout_request | default(30000) }}
 
 # List of OpenSearch Dashboards client-side headers to send to OpenSearch. To send *no* client-side
 # headers, set this value to [] (an empty list).
-# opensearch.requestHeadersWhitelist: [ authorization ]
+opensearch.requestHeadersWhitelist:
+{% for header in opensearch_dashboards.opensearch.whitelist_headers_request | default(["authorization", "securitytenant"]) %}
+  - {{ header }}
+{% endfor %}
 
 # Header names and values that are sent to OpenSearch. Any custom headers cannot be overwritten
 # by client-side headers, regardless of the opensearch.requestHeadersWhitelist configuration.
-# opensearch.customHeaders: {}
+opensearch.customHeaders: {}
 
 # Time in milliseconds for OpenSearch to wait for responses from shards. Set to 0 to disable.
-# opensearch.shardTimeout: 30000
+opensearch.shardTimeout: {{ opensearch_dashboards.opensearch.timeout.shard | default(30000) }}
 
 # Logs queries sent to OpenSearch. Requires logging.verbose set to true.
 # opensearch.logQueries: false
 
 # Specifies the path where OpenSearch Dashboards creates the process ID file.
-# pid.file: /var/run/opensearchDashboards.pid
+pid.file: {{ opensearch_dashboards.pid_file | default("/var/run/opensearchDashboards.pid") }}
 
 # Enables you to specify a file where OpenSearch Dashboards stores log output.
-# logging.dest: stdout
+logging.dest: {{ opensearch_dashboards.log_file | default("stdout") }}
 
 # 2.15 Ignore 'ENOSPC' error for logging stream.
 # When set to true, the 'ENOSPC' error message will not cause the OpenSearch Dashboards process to crash. Otherwise,
@@ -127,55 +130,21 @@ opensearch.ssl.verificationMode: {{ opensearch_dashboards.opensearch.ssl.verific
 
 # Set the interval in milliseconds to sample system and process performance
 # metrics. Minimum is 100ms. Defaults to 5000.
-# ops.interval: 5000
+ops.interval: {{ opensearch_dashboards.metrics_interval_milliseconds | default(5000) }}
 
 # Specifies locale to be used for all localizable strings, dates and number formats.
 # Supported languages are the following: English - en , by default , Chinese - zh-CN .
-# i18n.locale: "en"
-
-# Set the allowlist to check input graphite Url. Allowlist is the default check list.
-# vis_type_timeline.graphiteAllowedUrls: ['https://www.hostedgraphite.com/UID/ACCESS_KEY/graphite']
-
-# Set the blocklist to check input graphite Url. Blocklist is an IP list.
-# Below is an example for reference
-# vis_type_timeline.graphiteBlockedIPs: [
-#  //Loopback
-#  '127.0.0.0/8',
-#  '::1/128',
-#  //Link-local Address for IPv6
-#  'fe80::/10',
-#  //Private IP address for IPv4
-#  '10.0.0.0/8',
-#  '172.16.0.0/12',
-#  '192.168.0.0/16',
-#  //Unique local address (ULA)
-#  'fc00::/7',
-#  //Reserved IP address
-#  '0.0.0.0/8',
-#  '100.64.0.0/10',
-#  '192.0.0.0/24',
-#  '192.0.2.0/24',
-#  '198.18.0.0/15',
-#  '192.88.99.0/24',
-#  '198.51.100.0/24',
-#  '203.0.113.0/24',
-#  '224.0.0.0/4',
-#  '240.0.0.0/4',
-#  '255.255.255.255/32',
-#  '::/128',
-#  '2001:db8::/32',
-#  'ff00::/8',
-# ]
-# vis_type_timeline.graphiteBlockedIPs: []
+i18n.locale: "{{ opensearch_dashboards.locale | default('en') }}"
 
 {% if opensearch_dashboards.branding is defined %}
+# Setup your branding
 opensearchDashboards.branding:
   logo:
     defaultUrl: "{{ opensearch_dashboards.branding.logo_default_url | default('') }}"
     darkModeUrl: "{{ opensearch_dashboards.branding.logo_darkmode_url | default('') }}"
   mark:
     defaultUrl: "{{ opensearch_dashboards.branding.mark_default_url | default('') }}"
-    darkModeUrl: "{{ opensearch_dashboards.branding.logo_darkmode_url | default('') }}"
+    darkModeUrl: "{{ opensearch_dashboards.branding.mark_darkmode_url | default('') }}"
   loadingLogo:
     defaultUrl: "{{ opensearch_dashboards.branding.loading_default_url | default('') }}"
     darkModeUrl: "{{ opensearch_dashboards.branding.loading_default_url | default('') }}"
@@ -185,11 +154,11 @@ opensearchDashboards.branding:
 
 # Set the value of this setting to true to capture region blocked warnings and errors
 # for your map rendering services.
-# map.showRegionBlockedWarning: false%
+# map.showRegionBlockedWarning: false
 
 # Set the value of this setting to false to suppress search usage telemetry
 # for reducing the load of OpenSearch cluster.
-# data.search.usageTelemetry.enabled: false
+data.search.usageTelemetry.enabled: {{ opensearch_dashboards.telemetry | default(false) }}
 
 # 2.4 renames 'wizard.enabled: false' to 'vis_builder.enabled: false'
 # Set the value of this setting to false to disable VisBuilder
@@ -222,10 +191,14 @@ opensearchDashboards.branding:
 # Set the value of this setting to true to enable UI Metric collections
 # usageCollection.uiMetric.enabled: false
 
-opensearch.requestHeadersWhitelist: [authorization, securitytenant]
-
-opensearch_security.multitenancy.enabled: true
-opensearch_security.multitenancy.tenants.preferred: [Private, Global]
-opensearch_security.readonly_mode.roles: [kibana_read_only]
+opensearch_security.multitenancy.enabled: {{ opensearch_dashboards.opensearch.multitenancy_enabled | default('true') }}
+opensearch_security.multitenancy.tenants.preferred:
+{% for tenant in opensearch_dashboards.opensearch.tenants | default(['Private','Global']) %}
+  - {{ tenant }}
+{% endfor %}
+opensearch_security.readonly_mode.roles:
+{% for role in opensearch_dashboards.opensearch.readonly_roles | default(['kibana_read_only']) %}
+  - {{ role }}
+{% endfor %}
 # Use this setting if you are running opensearch-dashboards without https
-opensearch_security.cookie.secure: false
+opensearch_security.cookie.secure: {{ opensearch_dashboards.opensearch.cookies_secure | default('false') }}
