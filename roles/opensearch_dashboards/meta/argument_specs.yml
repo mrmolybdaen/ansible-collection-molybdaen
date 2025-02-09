@@ -103,6 +103,35 @@ argument_specs:
             description:
               - "This dictionary contains information for the OpenSearch instance the Dashboards application connects to."
             options:
+              admin:
+                type: "dict"
+                required: false
+                description:
+                  - "If you create users within this role, specify an OpenSearch administrative user to use."
+                options:
+                  instance:
+                    type: "str"
+                    required: false
+                    description:
+                      - "Primary node of the OpenSearch cluster. Specify if URL is different form https://localhost:9200."
+                  name:
+                    type: "str"
+                    required: false
+                    default: 'admin'
+                    description:
+                      - "Name of an administrative user of OpenSearch."
+                      - "Must be defined if this role creates Dashboards users."
+                  password:
+                    type: "str"
+                    required: false
+                    description:
+                      - "Password of the administrative user of OpenSearch."
+                      - "Must be defined if this role creates Dashboards users."
+                  validate_certs:
+                    type: "bool"
+                    required: false
+                    description:
+                      - "Specify whether to validate or not to validate certificates of the OpenSearch node when running requests against the API."
               instance_list:
                 type: "list"
                 elements: "str"
@@ -280,3 +309,22 @@ argument_specs:
             default: false
             description:
               - "Define whether to enable or to suppress search telemetry data of OpenSearch."
+          nftables:
+            type: "dict"
+            required: false
+            description:
+              - "Define IPv4 and IPv6 addresses allowed to connect to OpenSearch Dashboards."
+              - "Regardless what you define, C(localhost) will always be allowed."
+            options:
+              whitelist_ipv4:
+                type: "list"
+                elements: "str"
+                description:
+                  - "List of IPv4 ranges in CIDR notation."
+                  - "It is not necessary to specify C('127.0.0.1')."
+              whitelist_ipv6:
+                type: "list"
+                elements: "str"
+                description:
+                  - "List of IPv6 ranges in CIDR notation."
+                  - "It is not necessary to specify C('::1')."

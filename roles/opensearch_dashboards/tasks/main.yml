@@ -7,6 +7,11 @@
   ansible.builtin.import_role:
     name: "mrmolybdaen.molybdaen.opensearch"
     tasks_from: "users"
+  vars:
+    opensearch_url: "{{ opensearch_dashboards.opensearch.admin.instance | default(omit) }}"
+    opensearch_admin_user: "{{ opensearch_dashboards.opensearch.admin.name | default('admin') }}"
+    opensearch_admin_password: "{{ opensearch_dashboards.opensearch.admin.password }}"
+    opensearch_validate_certs: "{{ opensearch_dashboards.opensearch.admin.validate_certs | default(true) }}"
   tags:
     - opensearch-dashboards
     - opensearch-dashboards-users
