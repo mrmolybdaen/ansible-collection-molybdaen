@@ -9,23 +9,9 @@
     dest: /etc/opensearch-dashboards/opensearch_dashboards.yml
     mode: "0640"
     owner: root
-    group: root
+    group: opensearch-dashboards
   notify: handlers_systemd_unit_restart_opensearch_dashboards
   become: true
   tags:
     - opensearch-dashboards
     - opensearch-dashboards-configure
-
-- name: "configure | Configure Node options for OpenSearch Dashboards ..."
-  ansible.builtin.template:
-    src: etc/opensearch_dashboards/node.options.j2
-    dest: /etc/opensearch_dashboards/node.options
-    mode: "0640"
-    owner: root
-    group: root
-  notify: handlers_systemd_unit_restart_opensearch_dashboards
-  become: true
-  tags:
-    - opensearch-dashboards
-    - opensearch-dashboards-configure
-    - opensearch-dashboards-configure-node
