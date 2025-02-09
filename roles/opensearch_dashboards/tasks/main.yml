@@ -12,25 +12,32 @@
     - opensearch-dashboards-users
 
 - name: "Import sources list configuration tasks ..."
-  ansible.builtin.import: "sources.yml"
+  ansible.builtin.import_tasks: "sources.yml"
   tags:
     - opensearch-dashboards
     - opensearch-dashboards-sources
 
 - name: "Import install tasks ..."
-  ansible.builtin.import: "install.yml"
+  ansible.builtin.import_tasks: "install.yml"
   tags:
     - opensearch-dashboards
     - opensearch-dashboards-install
 
+- name: "Import tasks for asset deployment"
+  when: opensearch_dashboards.branding.asset_source is defined and opensearch_dashboards.branding.asset_source | length
+  ansible.builtin.import_tasks: "branding.yml"
+  tags:
+    - opensearch-dashboards
+    - opensearch-dashboards-branding
+
 - name: "Import systemd tasks ..."
-  ansible.builtin.import: "systemd.yml"
+  ansible.builtin.import_tasks: "systemd.yml"
   tags:
     - opensearch-dashboards
     - opensearch-dashboards-systemd
 
 - name: "Import OpenSearch configuration tasks ..."
-  ansible.builtin.import: "configure.yml"
+  ansible.builtin.import_tasks: "configure.yml"
   tags:
     - opensearch-dashboards
     - opensearch-dashboards-config

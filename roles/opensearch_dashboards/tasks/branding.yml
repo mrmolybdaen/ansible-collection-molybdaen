@@ -1,0 +1,15 @@
+---
+
+# Copyright: (c) 2025, Christian Siegel <molybdaen@mr42.org>
+# GNU General Public License v3.0+ (see LICENSE or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+- name: "branding | Deploy custom assets ..."
+  ansible.builtin.copy:
+    src: "{{ opensearch_dashboards.branding.asset_source }}"
+    dest: "ui/assets"
+    mode: "0755"
+    owner: root
+    group: root
+  tags:
+    - opensearch-dashboards
+    - opensearch-dashboards-branding
