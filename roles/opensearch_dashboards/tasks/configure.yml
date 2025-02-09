@@ -5,8 +5,8 @@
 
 - name: "configure | Configure OpenSearch Dashboards ..."
   ansible.builtin.template:
-    src: etc/opensearch_dashboards/internal_users.yml.j2
-    dest: /etc/opensearch_dashboards/internal_users.yml
+    src: etc/opensearch-dashboards/opensearch_dashboards.yml.j2
+    dest: /etc/opensearch-dashboards/opensearch_dashboards.yml
     mode: "0640"
     owner: root
     group: root
