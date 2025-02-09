@@ -4,6 +4,7 @@
 # GNU General Public License v3.0+ (see LICENSE or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 - name: "Import firewalling tasks ..."
+  when: use_nftables is not defined or use_nftables
   ansible.builtin.import_tasks: "nftables.yml"
   tags:
     - opensearch

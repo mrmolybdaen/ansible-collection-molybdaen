@@ -41,3 +41,10 @@
   tags:
     - opensearch-dashboards
     - opensearch-dashboards-config
+
+- name: "Import firewall rulesets ..."
+  when: use_nftables is not defined or use_nftables
+  ansible.builtin.import_tasks: "nftables.yml"
+  tags:
+    - opensearch-dashboards
+    - opensearch-dashboards-nftables
