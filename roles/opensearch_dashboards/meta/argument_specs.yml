@@ -176,7 +176,7 @@ argument_specs:
                 description:
                   - "TLS/SSL configuration options"
                 options:
-                  verificationMode:
+                  verification_mode:
                     type: "str"
                     required: false
                     choices:
