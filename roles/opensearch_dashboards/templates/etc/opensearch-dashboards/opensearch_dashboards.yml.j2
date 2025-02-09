@@ -17,7 +17,11 @@ server.host: "{{ opensearch_dashboards.server.host | default('localhost') }}"
 # Use the `server.rewriteBasePath` setting to tell OpenSearch Dashboards if it should remove the basePath
 # from requests it receives, and to prevent a deprecation warning at startup.
 # This setting cannot end in a slash.
-server.basePath: "{{ opensearch_dashboards.server.base_path | default('') }}"
+{% if opensearch_dashboards.server.base_path is defined %}
+server.basePath: "{{ opensearch_dashboards.server.base_path }}"
+{% else %}
+# server.basePath: ""
+{% endif %}
 
 # Specifies whether OpenSearch Dashboards should rewrite requests that are prefixed with
 # `server.basePath` or require that they are rewritten by your reverse proxy.
