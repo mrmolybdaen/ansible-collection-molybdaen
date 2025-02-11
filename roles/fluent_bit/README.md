@@ -8,9 +8,25 @@ It is truly universal as it has inputs for files as well as http, it can forward
 
 This versatility is interesting to me, personally, because I play with all of those things in private and at work.
 
-In this project we focus on OpenSearch and Elasticsearch and send metrics as well as logs.
+## Inputs
 
-As with any other role provided, we try to focus on universality for configuration. However, if you wanna configure your
-ingest filters or processors here, you are on the wrong place.
+Define your custom inputs using `fluentbit.inputs` array.
+The list contains of dictionaries. We will not check if your config is correct within ansible.
+Please refer to the (documentation)[https://docs.fluentbit.io/manual/pipeline/inputs]
 
-It is better to provide such grade of customization in a package or another role.
+## Outputs
+
+Define your custom inputs using `fluentbit.outputs` array.
+The list contains of dictionaries. We will not check if your config is correct within ansible.
+Please refer to the (documentation)[https://docs.fluentbit.io/manual/pipeline/outputs
+
+## Filters
+
+Define your custom inputs using `fluentbit.filters` array.
+The list contains of dictionaries. We will not check if your config is correct within ansible.
+Please refer to the (documentation)[https://docs.fluentbit.io/manual/pipeline/filters
+
+## Processors
+Define your custom inputs using `fluentbit.processors` array.
+The list contains of dictionaries. We will not check if your config is correct within ansible.
+Please refer to the (documentation)[https://docs.fluentbit.io/manual/pipeline/processors

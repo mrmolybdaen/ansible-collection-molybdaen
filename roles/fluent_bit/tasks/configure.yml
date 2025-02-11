@@ -2,3 +2,136 @@
 
 # Copyright: (c) 2025, Christian Siegel <molybdaen@mr42.org>
 # GNU General Public License v3.0+ (see LICENSE or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+- name: "configure | Remove classic configuration ..."
+  ansible.builtin.file:
+    state: absent
+    path: "/etc/fluent-bit/fluent-bit.conf"
+  become: true
+  tags:
+    - fluentbit
+    - fluentbit-configuration
+
+- name: "configure | Create main configuration file ..."
+  ansible.builtin.template:
+    src: etc/fluent-bit/fluent-bit.yml.j2
+    dest: /etc/fluent-bit/fluent-bit.yml
+  become: true
+  tags:
+    - fluentbit
+    - fluentbit-configuration
+
+- name: "configure | Create configuration subdirectories ..."
+  ansible.builtin.file:
+    state: directory
+    path: "/etc/fluent-bit/{{ item }}"
+    owner: root
+    group: root
+    mode: "0750"
+  loop:
+    - "filters"
+    - "parsers"
+    - "pipelines"
+    - "processors"
+    - "inputs"
+    - "outputs"
+  become: true
+  tags:
+    - fluentbit
+    - fluentbit-configuration
+
+- name: "configure | Deploy filters configuration"
+  ansible.builtin.template:
+    src: etc/fluent-bit/filters.yml.j2
+    dest: "/etc/fluent-bit/filters/{{ filter.name }}.yml"
+    owner: root
+    group: root
+    mode: "0640"
+  loop: "{{ fluentbit.filters | default(omit) }}"
+  loop_control:
+    loop_var: filter
+  become: true
+  tags:
+    - fluentbit
+    - fluentbit-configuration
+    - fluentbit-configuration-filters
+
+- name: "configure | Deploy parser configuration"
+  ansible.builtin.template:
+    src: etc/fluent-bit/parsers.yml.j2
+    dest: "/etc/fluent-bit/parsers/{{ parser.name }}.yml"
+    owner: root
+    group: root
+    mode: "0640"
+  loop: "{{ fluentbit.parsers | default([]) }}"
+  loop_control:
+    loop_var: parser
+  become: true
+  tags:
+    - fluentbit
+    - fluentbit-configuration
+    - fluentbit-configuration-parsers
+
+- name: "configure | Deploy pipeline configuration"
+  ansible.builtin.template:
+    src: etc/fluent-bit/pipelines.yml.j2
+    dest: "/etc/fluent-bit/pipelines/{{ pipeline.name }}.yml"
+    owner: root
+    group: root
+    mode: "0640"
+  loop: "{{ fluentbit.pipelines | default([]) }}"
+  loop_control:
+    loop_var: pipeline
+  become: true
+  tags:
+    - fluentbit
+    - fluentbit-configuration
+    - fluentbit-configuration-pipelines
+
+- name: "configure | Deploy inputs configuration"
+  ansible.builtin.template:
+    src: etc/fluent-bit/inputs.yml.j2
+    dest: "/etc/fluent-bit/pipelines/{{ inputs.name }}.yml"
+    owner: root
+    group: root
+    mode: "0640"
+  loop: "{{ fluentbit.inputs | default([]) }}"
+  loop_control:
+    loop_var: input
+  become: true
+  tags:
+    - fluentbit
+    - fluentbit-configuration
+    - fluentbit-configuration-inputs
+
+- name: "configure | Deploy outputs configuration"
+  ansible.builtin.template:
+    src: etc/fluent-bit/outputs.yml.j2
+    dest: "/etc/fluent-bit/pipelines/{{ output.name }}.yml"
+    owner: root
+    group: root
+    mode: "0640"
+  loop: "{{ fluentbit.outputs | default([]) }}"
+  loop_control:
+    loop_var: output
+  become: true
+  tags:
+    - fluentbit
+    - fluentbit-configuration
+    - fluentbit-configuration-outputs
+
+- name: "configure | Deploy processors configuration"
+  ansible.builtin.template:
+    src: etc/fluent-bit/processors.yml.j2
+    dest: "/etc/fluent-bit/pipelines/{{ processor.name }}.yml"
+    owner: root
+    group: root
+    mode: "0640"
+  loop: "{{ fluentbit.processors | default([]) }}"
+  loop_control:
+    loop_var: output
+  become: true
+  tags:
+    - fluentbit
+    - fluentbit-configuration
+    - fluentbit-configuration-processors

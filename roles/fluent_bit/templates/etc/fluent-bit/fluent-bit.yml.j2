@@ -1,0 +1,45 @@
+---
+
+{% if fluentbit.envs is defined and flientbit.envs | length %}
+# This section provides a list of custom environment variables.
+envs:
+{% for variable,value in fluentbit.envs %}
+  {{ variable }}:{{ value }}
+{% endfor %}
+{% endif %}
+
+# This section defines the service.
+service:
+  flush: {{ fluentbit.service.flush | default(10) }}
+  grace: {{ fluentbit.service.grace | default(5) }}
+  daemon: {{ fluentbit.service.daemon | default('no') }}
+  dns.mode: {{ fluentbit.service.dns_mode | default('UDP') }}
+  log_file: {{ fluentbit.service.log.file | default(omit) }}
+  log_level: {{ fluentbit.service.log.level | default('info') }}
+  parsers_file: {{ fluentbit.service.parsers_file | default(omit) }}
+  streams_file: {{ fluentbit.service.streams_file | default(omit) }}
+  http_server: {{ fluentbit.service.http.server | default('off') }}
+  http_listen: {{ fluentbit.service.http.listen | default(omit) }}
+  http_port: {{ fluentbit.service.http.port | default(omit) }}
+  coro_stack_size: {{ fluentbit.service.coro_stack_size | default(24576) }}
+  scheduler.base: {{ fluentbit.service.scheduler.base | default(5) }}
+  scheduler.cap: {{ fluentbit.service.scheduler.cap | default(2000) }}
+  json.convert_nan_to_null: {{ fluentbit.service.json_nan2null | default('false') }}
+  sp.convert_from_str_to_num: {{ fluentbit.service.sp.str2num | default('true') }}
+
+{% if fluentbit.plugins is defined and fluentbit.plugins | length %}
+# List of paths to dynamically linked libraries
+plugins:
+{% for plugin in fluentbit.plugins %}
+  - {{ plugin.path }}
+{% endfor %}
+{% endif %}
+
+# Include different sections
+includes:
+  - inputs/*.yml
+  - filters/*.yml
+  - processors/*.yml
+  - pipelines/*.yml
+  - parsers/*.yml
+  - outputs/*.yml

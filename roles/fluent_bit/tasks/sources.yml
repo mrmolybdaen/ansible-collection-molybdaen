@@ -2,3 +2,39 @@
 
 # Copyright: (c) 2025, Christian Siegel <molybdaen@mr42.org>
 # GNU General Public License v3.0+ (see LICENSE or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+- name: "sources | Install prerequisites ..."
+  ansible.builtin.apt:
+    state: present
+    name:
+      - gnupg2
+      - ca-certificates
+      - curl
+  become: true
+  tags:
+    - opensearch
+    - opensearch-sources
+    - opensearch-sources-apt
+
+- name: "sources | Get and install repository key ..."
+  ansible.builtin.deb822_repository:
+    name: "fluentbit"
+    types: deb
+    suites: "{{ ansible_facts['distribution_release'] }}"
+    components: main
+    uris: "https://packages.fluentbit.io/debian/{{ ansible_facts['distribution_release'] }}"
+    signed_by: "https://packages.fluentbit.io/fluentbit.key"
+  become: true
+  tags:
+    - fluentbit
+    - fluentbit-sources
+    - fluentbit-sources-list
+
+- name: "sources | Update package data ..."
+  ansible.builtin.apt:
+    update_cache: true
+  become: true
+  tags:
+    - fluentbit
+    - fluentbit-sources
+    - fluentbit-sources-list
