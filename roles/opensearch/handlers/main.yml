@@ -13,9 +13,19 @@
   become: true
   listen: handlers_systemd_unit_restart_opensearch
 
-
 - name: "Update security configuration ..."
   ansible.builtin.command:
-    cmd: /usr/share/opensearch/plugins/opensearch-security/tools/securityadmin.sh
+    argv:
+    - "/usr/share/opensearch/plugins/opensearch-security/tools/securityadmin.sh"
+    - "-f"
+    - "/etc/opensearch/opensearch-security/internal_users.yml"
+    - "-cacert"
+    - "{{ opensearch.securityadmin.certs.ca | default('/etc/opensearch/root-ca.pem') }}"
+    - "-cert"
+    - "{{ opensearch.securityadmin.certs.cert | default('/etc/opensearch/kirk.pem') }}"
+    - "-key"
+    - "{{ opensearch.securityadmin.certs.key | default('/etc/opensearch/kirk-key.pem') }}"
+  environment:
+    OPENSEARCH_JAVA_HOME: "/usr/share/opensearch/jdk"
   become: true
-  listen: handlers_opensearch_securityadmin
+  listen: handlers_opensearch_securityadmin_script_internal_users

@@ -8,7 +8,7 @@
     url: "{{ opensearch_url | default('https://localhost:9200') }}/_plugins/_security/api/actiongroups/{{ opensearch_actiongroup.name }}"
     url_username: "{{ opensearch_admin_user }}"
     url_password: "{{ opensearch_admin_password }}"
-    method: "{{ opensearch_user.method | default('PUT') }}"
+    method: "{{ opensearch_actiongroup.method | default('PUT') }}"
     validate_certs: "{{ opensearch_validate_certs | default(true) }}"
     body_format: json
     status_code:
@@ -31,7 +31,7 @@
     url: "{{ opensearch_url | default('https://localhost:9200') }}/_plugins/_security/api/roles/{{ opensearch_role.name }}"
     url_username: "{{ opensearch_admin_user }}"
     url_password: "{{ opensearch_admin_password }}"
-    method: "{{ opensearch_user.method | default('PUT') }}"
+    method: "{{ opensearch_role.method | default('PUT') }}"
     validate_certs: "{{ opensearch_validate_certs | default(true) }}"
     body_format: json
     status_code:
@@ -39,6 +39,8 @@
       - 201
       - 202
     body:
+      hidden: "{{ opensearch_role.hidden | default(omit) }}"
+      reserved: "{{ opensearch_role.reserved | default(omit) }}"
       cluster_permissions: "{{ opensearch_role.cluster_permissions | default(omit) }}"
       index_permissions: "{{ opensearch_role.index_permissions | default(omit) }}"
       tenant_permissions: "{{ opensearch_role.tenant_permissions | default(omit) }}"
@@ -68,11 +70,13 @@
       # However, leaking a hash in a log leaves enough time to change the password before someone can
       # decrypt the hash.
       # OpenSearch currently uses Bcrypt for hashing.
-      hash: "{{ opensearch_user.password | ansible.builtin.password_hash(hashtype='bcrypt')}}"
-      opendistro_security_roles: "{{ opensearch_user.security_roles | default(omit) }}"
+      reserved: "{{ opensearch_user.reserved | default(omit) }}"
+      hidden: "{{ opensearch_user.hidden | default(omit) }}"
+      hash: "{{ opensearch_user.password | ansible.builtin.password_hash(hashtype='bcrypt') }}"
+      opendistro_security_roles: "{{ opensearch_user.opendistro_security_roles | default(omit) }}"
       backend_roles: "{{ opensearch_user.backend_roles | default(omit) }}"
       attributes: "{{ opensearch_user.attributes | default(omit) }}"
-  no_log: true
+  no_log: false
   loop: "{{ opensearch_api_users | default([]) }}"
   loop_control:
     index_var: opensearch_user_index

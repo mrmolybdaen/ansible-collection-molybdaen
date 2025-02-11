@@ -12,10 +12,95 @@ argument_specs:
       - By default configure single node mode.
     author: Christian Siegel
     options:
-      opensearch_validate_certs:
-        type: "bool"
+      opensearch:
+        type: "dict"
         required: false
-        default: true
+        description:
+          - "Define OpenSearch basic configuration."
+        options:
+          internal_users:
+            type: "dict"
+            required: false
+            description:
+              - "Define special users and roles"
+            options:
+              admin:
+                name:
+                  type: "str"
+                  required: true
+                  description:
+                    - "Name of the OpenSearch admin user."
+                password:
+                  type: "str"
+                  required: true
+                  description:
+                    - "Password of the OpenSearch admin user."
+                    - "Will get hashed with bcrypt."
+              anomalyadmin:
+                name:
+                  type: "str"
+                  required: true
+                  description:
+                    - "Name of the OpenSearch Anomalyadmin user."
+                password:
+                  type: "str"
+                  required: true
+                  description:
+                    - "Password of the Anomalyadmin user."
+                    - "Will get hashed with bcrypt."
+              dashboardsserver:
+                name:
+                  type: "str"
+                  required: true
+                  description:
+                    - "Name of the OpenSearch Dashboards connection user."
+                password:
+                  type: "str"
+                  required: true
+                  description:
+                    - "Password of the OpenSearch Dashboards connection user."
+                    - "Will get hashed with bcrypt."
+              additional_users:
+                type: "list"
+                elements: "dict"
+                required: false
+                description:
+                  - "List additional special users."
+                options:
+                  name:
+                    type: "str"
+                    required: true
+                    description:
+                      - "User name"
+                      - "Should not contain dashes."
+                  password:
+                    type: "str"
+                    required: true
+                    description:
+                      - "User password, will be hashed with bcrypt."
+                  opendistro_security_roles:
+                    type: "list"
+                    elements: "str"
+                    required: false
+                    description:
+                      - "Set opendistro_security_roles for user."
+                  backend_roles:
+                    type: "list"
+                    elements: "str"
+                    required: false
+                    description:
+                      - "Specify a list of backend_roles"
+                  description_str:
+                    type: "str"
+                    required: true
+                    description:
+                      - "Provide a description for the user."
+      opensearch_validate_certs:
+        type: "str"
+        required: false
+        choices:
+          - "true"
+          - "false"
         description:
           - "Enable or disable certificate validation for API calls done by this script."
       opensearch_version:
@@ -48,6 +133,14 @@ argument_specs:
             required: true
             description:
               - "Name of the action group"
+          method:
+            type: "str"
+            required: false
+            choices:
+              - "PUT"
+              - "PATCH"
+            description:
+              - "HTTP method to (re-)create or update an action group."
           allowed_actions:
             type: "list"
             elements: "str"
@@ -63,6 +156,30 @@ argument_specs:
         description:
           - "List of dictionaries of custom roles and their permissions to create"
         options:
+          method:
+            type: "str"
+            required: false
+            choices:
+              - "PUT"
+              - "PATCH"
+            description:
+              - "HTTP method to (re-)create or update a role."
+          hidden:
+            type: "str"
+            required: false
+            choices:
+              - "true"
+              - "false"
+            description:
+              - "Define if the role is hidden."
+          reserved:
+            type: "str"
+            required: false
+            choices:
+              - "true"
+              - "false"
+            description:
+              - "Define if the role can be edited via API"
           name:
             type: "str"
             required: true
@@ -94,6 +211,30 @@ argument_specs:
         description:
           - "List of dictionaries of users to create."
         options:
+          method:
+            type: "str"
+            required: false
+            choices:
+              - "PUT"
+              - "PATCH"
+            description:
+              - "HTTP method to (re-)create or update users."
+          hidden:
+            type: "str"
+            required: false
+            choices:
+              - "true"
+              - "false"
+            description:
+              - "Define if the role is hidden."
+          reserved:
+            type: "str"
+            required: false
+            choices:
+              - "true"
+              - "false"
+            description:
+              - "Define if the role can be edited via API"
           name:
             type: "str"
             required: true
@@ -137,20 +278,23 @@ argument_specs:
           - "This dictionary contains all configuration directives for opensearch.yml"
         options:
           bind_address:
-            type: "str"
+            type: "list"
+            elements: "str"
             required: false
-            default: "::1"
             description:
-              - "Address OpenSearch will bind to."
+              - "List of addresses OpenSearch will bind to."
+              - "C('localhost') is valid too."
           cluster_name:
             type: "str"
             required: false
             description:
               - "Name of the opensearch cluster"
           cluster_remote_store:
-            type: "bool"
+            type: "str"
             required: false
-            default: true
+            choices:
+              - "true"
+              - "false"
             description:
               - "Controls whether cluster imposes index creation only with remote store enabled"
           discovery_type:
@@ -173,8 +317,11 @@ argument_specs:
             description:
               - "Public HTTP port OpenSearch will bind to."
           memory_lock:
-            type: "bool"
+            type: "str"
             required: false
+            choices:
+              - "true"
+              - "false"
             description:
               - "Disable or enable memlock and swap."
               - "Swap might decrease performance."

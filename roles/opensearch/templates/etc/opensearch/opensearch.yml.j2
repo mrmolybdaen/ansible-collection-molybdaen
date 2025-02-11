@@ -52,7 +52,10 @@ bootstrap.memory_lock: {{ opensearch_opensearch_yml.memory_lock | default(true) 
 #
 # Set the bind address to a specific IP (IPv4 or IPv6):
 #
-network.host: {{ opensearch_opensearch_yml.bind_address | default("::1") }}
+network.host:
+{% for address in opensearch_opensearch_yml.bind_address | default(["localhost"]) %}
+  - {{ address }}
+{% endfor %}
 #
 # Set a custom port for HTTP:
 #
