@@ -69,3 +69,19 @@
     - fluentbit
     - fluentbit-configuration
     - fluentbit-configuration-pipelines
+
+- name: "configure | Deploy additional configuration ..."
+  ansible.builtin.template:
+    src: "etc/fluent-bit/{{ item }}.yml.j2"
+    dest: "/etc/fluent-bit/{{ item }}.yml.j2"
+    mode: "0644"
+    owner: root
+    group: root
+  loop:
+    - "env"
+    - "plugins"
+    - "streams"
+  become: true
+  tags:
+    - fluentbit
+    - fluentbit-configuration

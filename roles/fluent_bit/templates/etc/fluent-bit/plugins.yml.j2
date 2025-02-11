@@ -1,0 +1,7 @@
+{% if fluentbit.plugins is defined and fluentbit.plugins | length %}
+# List of paths to dynamically linked libraries
+plugins:
+{% for plugin in fluentbit.plugins %}
+  - {{ plugin.path }}
+{% endfor %}
+{% endif %}

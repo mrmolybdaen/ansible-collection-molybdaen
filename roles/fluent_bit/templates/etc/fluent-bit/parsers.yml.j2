@@ -1,10 +1,10 @@
 parsers:
-  - name: apache
+  - name: apache2
     format: regex
     regex: '^(?<host>[^ ]*) [^ ]* (?<user>[^ ]*) \[(?<time>[^\]]*)\] "(?<method>\S+)(?: +(?<path>[^\"]*?)(?: +\S*)?)?" (?<code>[^ ]*) (?<size>[^ ]*)(?: "(?<referer>[^\"]*)" "(?<agent>[^\"]*)")?$'
     time_key: time
     time_format: "%d/%b/%Y:%H:%M:%S %z"
-  - name: apache_error
+  - name: apache2_error
     format: regex
     regex: '^\[[^ ]* (?<time>[^\]]*)\] \[(?<level>[^\]]*)\](?: \[pid (?<pid>[^\]]*)\])?( \[client (?<client>[^\]]*)\])? (?<message>.*)$'
   - name: nginx
@@ -16,10 +16,6 @@ parsers:
   - name: k8s-nginx-ingress
     format: regex
     regex: '^(?<host>[^ ]*) - (?<user>[^ ]*) \[(?<time>[^\]]*)\] "(?<method>\S+)(?: +(?<path>[^\"]*?)(?: +\S*)?)?" (?<code>[^ ]*) (?<size>[^ ]*) "(?<referer>[^\"]*)" "(?<agent>[^\"]*)" (?<request_length>[^ ]*) (?<request_time>[^ ]*) \[(?<proxy_upstream_name>[^ ]*)\] (\[(?<proxy_alternative_upstream_name>[^ ]*)\] )?(?<upstream_addr>[^ ]*) (?<upstream_response_length>[^ ]*) (?<upstream_response_time>[^ ]*) (?<upstream_status>[^ ]*) (?<reg_id>[^ ]*).*$'
-    time_key: time
-    time_format: "%d/%b/%Y:%H:%M:%S %z"
-  - name: json
-    format: json
     time_key: time
     time_format: "%d/%b/%Y:%H:%M:%S %z"
   - name: json
@@ -89,9 +85,10 @@ parsers:
     regex: '^\<(?<pri>[0-9]{1,5})\>1 (?<time>[^ ]+) (?<host>[^ ]+) kernel - - - \[[0-9\.]*\] (?<logprefix>[^ ]*)\s?IN=(?<in>[^ ]*) OUT=(?<out>[^ ]*) MAC=(?<macsrc>[0-9a-f]{2}:[0-9a-f]{2}:[0-9a-f]{2}:[0-9a-f]{2}:[0-9a-f]{2}:[0-9a-f]{2}):(?<macdst>[0-9a-f]{2}:[0-9a-f]{2}:[0-9a-f]{2}:[0-9a-f]{2}:[0-9a-f]{2}:[0-9a-f]{2}):(?<ethtype>[0-9a-f]{2}:[0-9a-f]{2}) SRC=(?<saddr>[^ ]*) DST=(?<daddr>[^ ]*) LEN=(?<len>[^ ]*) TOS=(?<tos>[^ ]*) PREC=(?<prec>[^ ]*) TTL=(?<ttl>[^ ]*) ID=(?<id>[^ ]*) (D*F*)\s*PROTO=(?<proto>[^ ]*)\s?((SPT=)?(?<sport>[0-9]*))\s?((DPT=)?(?<dport>[0-9]*))\s?((LEN=)?(?<protolen>[0-9]*))\s?((WINDOW=)?(?<window>[0-9]*))\s?((RES=)?(?<res>0?x?[0-9]*))\s?(?<flag>[^ ]*)\s?((URGP=)?(?<urgp>[0-9]*))'
     time_key: time
     time_format: "%Y-%m-%dT%H:%M:%S.%L%z"
-{% for parser in fluentbit.parsers %}
-  - name: {{ parser.type }}
+{% for parser in fluentbit.parsers | default([]) %}
+  - name: {{ parser.name }}
     format: {{ parser.format }}
+    regex: '{{ parser.regex | default(omit) }}'
     time_key: {{ parser.time_key | default(omit) }}
     time_format: "{{ parser.time_format | default(omit) }}"
     time_keep: {{ parser.time_keep | default(omit) }}
