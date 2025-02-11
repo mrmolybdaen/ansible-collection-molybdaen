@@ -29,32 +29,14 @@
     group: root
     mode: "0750"
   loop:
-    - "filters"
     - "parsers"
     - "pipelines"
     - "processors"
-    - "inputs"
-    - "outputs"
   become: true
   tags:
     - fluentbit
     - fluentbit-configuration
 
-- name: "configure | Deploy filters configuration"
-  ansible.builtin.template:
-    src: etc/fluent-bit/filters.yml.j2
-    dest: "/etc/fluent-bit/filters/{{ filter.name }}.yml"
-    owner: root
-    group: root
-    mode: "0640"
-  loop: "{{ fluentbit.filters | default(omit) }}"
-  loop_control:
-    loop_var: filter
-  become: true
-  tags:
-    - fluentbit
-    - fluentbit-configuration
-    - fluentbit-configuration-filters
 
 - name: "configure | Deploy parser configuration"
   ansible.builtin.template:
@@ -87,51 +69,3 @@
     - fluentbit
     - fluentbit-configuration
     - fluentbit-configuration-pipelines
-
-- name: "configure | Deploy inputs configuration"
-  ansible.builtin.template:
-    src: etc/fluent-bit/inputs.yml.j2
-    dest: "/etc/fluent-bit/pipelines/{{ inputs.name }}.yml"
-    owner: root
-    group: root
-    mode: "0640"
-  loop: "{{ fluentbit.inputs | default([]) }}"
-  loop_control:
-    loop_var: input
-  become: true
-  tags:
-    - fluentbit
-    - fluentbit-configuration
-    - fluentbit-configuration-inputs
-
-- name: "configure | Deploy outputs configuration"
-  ansible.builtin.template:
-    src: etc/fluent-bit/outputs.yml.j2
-    dest: "/etc/fluent-bit/pipelines/{{ output.name }}.yml"
-    owner: root
-    group: root
-    mode: "0640"
-  loop: "{{ fluentbit.outputs | default([]) }}"
-  loop_control:
-    loop_var: output
-  become: true
-  tags:
-    - fluentbit
-    - fluentbit-configuration
-    - fluentbit-configuration-outputs
-
-- name: "configure | Deploy processors configuration"
-  ansible.builtin.template:
-    src: etc/fluent-bit/processors.yml.j2
-    dest: "/etc/fluent-bit/pipelines/{{ processor.name }}.yml"
-    owner: root
-    group: root
-    mode: "0640"
-  loop: "{{ fluentbit.processors | default([]) }}"
-  loop_control:
-    loop_var: output
-  become: true
-  tags:
-    - fluentbit
-    - fluentbit-configuration
-    - fluentbit-configuration-processors

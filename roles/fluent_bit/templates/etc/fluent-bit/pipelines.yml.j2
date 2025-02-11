@@ -1,0 +1,28 @@
+pipeline:
+  inputs:
+{% for input in fluentbit.pipeline.inputs %}
+    - name: {{ input.type }}
+{% for key,value in input.items() %}
+{% if key != 'type' %}
+      {{ key }}: {{ value }}
+{% endif %}
+{% endfor %}
+{% endfor %}
+  filters:
+{% for filter in fluentbit.pipeline.filters %}
+    - name: {{ filter.type }}
+{% for key,value in filter.items() %}
+{% if key != 'type' %}
+      {{ key }}: {{ value }}
+{% endif %}
+{% endfor %}
+{% endfor %}
+  outputs:
+{% for input in fluentbit.pipeline.outputs %}
+    - name: {{ input.type }}
+{% for key,value in input.items() %}
+{% if key != 'type' %}
+      {{ key }}: {{ value }}
+{% endif %}
+{% endfor %}
+{% endfor %}
