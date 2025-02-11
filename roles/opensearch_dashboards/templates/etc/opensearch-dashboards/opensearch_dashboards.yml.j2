@@ -25,7 +25,7 @@ server.basePath: "{{ opensearch_dashboards.server.base_path }}"
 
 # Specifies whether OpenSearch Dashboards should rewrite requests that are prefixed with
 # `server.basePath` or require that they are rewritten by your reverse proxy.
-server.rewriteBasePath: {{ opensearch_dashboards.server.rewrite_base_path | default(false) }}
+server.rewriteBasePath: {{ opensearch_dashboards.server.rewrite_base_path | default("false")}}
 
 # The maximum payload size in bytes for incoming server requests.
 server.maxPayloadBytes: {{ opensearch_dashboards.server.max_payload_bytes | default(10485760) }}
@@ -170,7 +170,7 @@ opensearchDashboards.branding:
 
 # Set the value of this setting to false to suppress search usage telemetry
 # for reducing the load of OpenSearch cluster.
-data.search.usageTelemetry.enabled: {{ opensearch_dashboards.telemetry | default(false) }}
+data.search.usageTelemetry.enabled: {{ opensearch_dashboards.telemetry | default("false") }}
 
 # 2.4 renames 'wizard.enabled: false' to 'vis_builder.enabled: false'
 # Set the value of this setting to false to disable VisBuilder
@@ -203,7 +203,7 @@ data.search.usageTelemetry.enabled: {{ opensearch_dashboards.telemetry | default
 # Set the value of this setting to true to enable UI Metric collections
 # usageCollection.uiMetric.enabled: false
 
-opensearch_security.multitenancy.enabled: {{ opensearch_dashboards.opensearch.multitenancy_enabled | default(true) }}
+opensearch_security.multitenancy.enabled: {{ opensearch_dashboards.opensearch.multitenancy_enabled | default("true") }}
 opensearch_security.multitenancy.tenants.preferred:
 {% for tenant in opensearch_dashboards.opensearch.tenants | default(['Private','Global']) %}
   - {{ tenant }}
@@ -213,4 +213,4 @@ opensearch_security.readonly_mode.roles:
   - {{ role }}
 {% endfor %}
 # Use this setting if you are running opensearch-dashboards without https
-opensearch_security.cookie.secure: {{ opensearch_dashboards.opensearch.cookies_secure | default(false) }}
+opensearch_security.cookie.secure: {{ opensearch_dashboards.opensearch.cookies_secure | default("false") }}

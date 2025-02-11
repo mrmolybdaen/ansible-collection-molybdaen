@@ -48,7 +48,10 @@ argument_specs:
                 description:
                   - "Set a custom base path. This cannot end in a slash!"
               rewrite_base_path:
-                type: "bool"
+                type: "str"
+                choices:
+                  - "true"
+                  - "false"
                 required: false
                 description:
                   - "Specify whether to rewrite requests prefixed with the base path will be rewritten by the Dashboards or a reverse proxy."
@@ -128,7 +131,10 @@ argument_specs:
                       - "Password of the administrative user of OpenSearch."
                       - "Must be defined if this role creates Dashboards users."
                   validate_certs:
-                    type: "bool"
+                    type: "str"
+                    choices:
+                      - "true"
+                      - "false"
                     required: false
                     description:
                       - "Specify whether to validate or not to validate certificates of the OpenSearch node when running requests against the API."
@@ -193,8 +199,11 @@ argument_specs:
                       - "Uses PEM format."
                       - "NOTE: This role will not deploy those files!"
               cookie_secure:
-                type: "bool"
+                type: "str"
                 required: false
+                choices:
+                  - "true"
+                  - "false"
                 description:
                   - "Set this to false if OpenSearch Dashboards is running without HTTPS."
               readonly_roles:
@@ -211,7 +220,10 @@ argument_specs:
                   - "Define preferred tenants."
                   - "If not defined uses Dashboards default of C(['Private', 'Global'])."
               multitenancy_enabled:
-                type: "bool"
+                type: "str"
+                choices:
+                  - "true"
+                  - "false"
                 required: false
                 description:
                   - "Enable or disable multitenancy in OpenSearch Dashboards."
@@ -304,7 +316,10 @@ argument_specs:
                 description:
                   - "Application title to show"
           telemetry:
-            type: "bool"
+            type: "str"
+            choices:
+              - "true"
+              - "false"
             required: false
             default: false
             description:
