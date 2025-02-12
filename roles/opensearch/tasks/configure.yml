@@ -46,3 +46,19 @@
     - opensearch
     - opensearch-configure
     - opensearch-configure-special_users
+
+- name: "configure | Internal roles configuration ..."
+  when: opensearch.internal_users is defined
+  ansible.builtin.template:
+    src: etc/opensearch/opensearch-security/roles_mapping.yml.j2
+    dest: /etc/opensearch/opensearch-security/roles_mapping.yml
+    mode: "0640"
+    owner: root
+    group: opensearch
+  #no_log: true
+  notify: handlers_opensearch_securityadmin_script_internal_roles_mapping
+  become: true
+  tags:
+    - opensearch
+    - opensearch-configure
+    - opensearch-configure-special_users

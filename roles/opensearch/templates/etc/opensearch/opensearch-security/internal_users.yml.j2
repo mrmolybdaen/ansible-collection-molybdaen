@@ -17,9 +17,6 @@ _meta:
 {{ opensearch.internal_users.dashboardsserver.name }}:
   hash: "{{ opensearch.internal_users.dashboardsserver.password | ansible.builtin.password_hash(hashtype='bcrypt') }}"
   reserved: false
-  opendistro_security_roles:
-    - "kibanaserver"
-    - "kibana_server"
   backend_roles:
     - "opensearch_dashboards_user"
   description: "OpenSearch Dashboards user"
