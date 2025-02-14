@@ -47,3 +47,8 @@ kibana_server:
   reserved: true
   users:
   - "{{ opensearch.internal_users.dashboardsserver.name }}"
+
+opensearch_dashboards_connector:
+  reserved: true
+  users:
+  - "{{ opensearch.internal_users.dashboardsserver.name }}"

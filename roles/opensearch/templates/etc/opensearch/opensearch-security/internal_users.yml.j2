@@ -16,10 +16,11 @@ _meta:
   description: "Anomalyadmin"
 {{ opensearch.internal_users.dashboardsserver.name }}:
   hash: "{{ opensearch.internal_users.dashboardsserver.password | ansible.builtin.password_hash(hashtype='bcrypt') }}"
-  reserved: false
+  reserved: true
   backend_roles:
-    - "opensearch_dashboards_user"
-  description: "OpenSearch Dashboards user"
+    - "kibana_server"
+    - "opensearch_dashboards_connector"
+  description: "OpenSearch Dashboards connection user"
 {% for user in opensearch.internal_users.additional_users | default([]) %}
 {{ user.name }}:
   hash: {{ user.password | ansible.builtin.password_hash(hashtype='bcrypt') }}
