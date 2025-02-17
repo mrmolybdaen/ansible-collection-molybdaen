@@ -60,3 +60,11 @@ pre-commit install
 
 Talking about pipelines, we run sanity, unit and integration tests in a pre-build phase as well as syntax checks and dry-runs
 and actual deployments in a post-build stage.
+
+## Roles and Playbooks
+
+Playbooks are prefixed with `playbook_` all the time.
+Most playbooks assume you want to configure a whole host. If you only need to run a specific role, then use tags.
+All roles use tags with their names.
+For example, if you want to run the `mrmolybdaen.molybdaen.opensearch` role from the playbook, use:
+```:~$ ansible-playbook mrmolybdaen.molybdaen.playbook_opensearch --tags opensearch --limit <opensearch-node>```
