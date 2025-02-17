@@ -22,7 +22,7 @@
     - sshd-systemd
 
 - name: "Configure firewall rule for SSH with nftables"
-  when: "not ('ufw' in ansible_play_role_names or 'firewalld' in ansible_play_role_names)"
+  when: use_nftables is not defined or use_nftables
   ansible.builtin.import_tasks: nftables.yml
   tags:
     - sshd

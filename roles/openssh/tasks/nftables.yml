@@ -119,7 +119,7 @@
     dest: /etc/nftables.d/97-sshd.set
     owner: root
     group: root
-    mode: "0644"
+    mode: "0640"
   register: openssh_nftables_config_sets
   become: true
   tags:
