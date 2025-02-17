@@ -1,0 +1,43 @@
+---
+
+# Copyright: (c) 2025, Christian Siegel <molybdaen@mr42.org>
+# GNU General Public License v3.0+ (see LICENSE or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+- name: "nftables | Copy nftables set configuration ..."
+  ansible.builtin.template:
+    src: etc/nftables.d/97-logstash.set.j2
+    dest: /etc/nftables.d/97-logstash.set
+    mode: "0644"
+    owner: root
+    group: root
+  notify: handlers_nftables_nft_list_ruleset
+  become: true
+  tags:
+    - logstash
+    - logstash-nftables
+
+- name: "nftables | Copy nftables IPv4 rules ..."
+  ansible.builtin.template:
+    src: etc/nftables.d/99-logstash-ipv4.app.j2
+    dest: etc/nftables.d/99-logstash-ipv4.app
+    mode: "0644"
+    owner: root
+    group: root
+  notify: handlers_nftables_nft_list_ruleset
+  become: true
+  tags:
+    - logstash
+    - logstash-nftables
+
+- name: "nftables | Copy nftables IPv6 rules ..."
+  ansible.builtin.template:
+    src: etc/nftables.d/99-logstash-ipv6.app.j2
+    dest: etc/nftables.d/99-logstash-ipv6.app
+    mode: "0644"
+    owner: root
+    group: root
+  notify: handlers_nftables_nft_list_ruleset
+  become: true
+  tags:
+    - logstash
+    - logstash-nftables

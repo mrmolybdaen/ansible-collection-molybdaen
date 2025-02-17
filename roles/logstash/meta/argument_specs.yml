@@ -1,0 +1,68 @@
+---
+
+# Copyright: (c) 2025, Christian Siegel <molybdaen@mr42.org>
+# GNU General Public License v3.0+ (see LICENSE or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+argument_specs:
+  main:
+    short_description: "Install and configure Elastic Logstash."
+    description:
+      - "This role installs and configures Logstash primarily for use with OpenSearch."
+    author: Christian Siegel
+    options:
+      use_nftables:
+        type: "bool"
+        required: false
+        description:
+          - "Define if firewalling tasks are done with nftables."
+          - "If not set, firewalling will be done using nftables by default to prevent more insecure configurations."
+      logstash:
+        type: "dict"
+        required: true
+        options:
+          version:
+            type: "int"
+            required: true
+            description:
+              - "Specify the major version, for example C(logstash.version: 8), which shall be installed."
+          nftables:
+            type: "dict"
+            required: false
+            description: "Provide firewalling configuration."
+            options:
+              dest_port:
+                type: "int"
+                required: false
+                description:
+                  - "Specify the port Logstash will listen on."
+              whitelist:
+                type: "dict"
+                required: true
+                description:
+                  - "Whitelist incoming traffic using Nftables' sets feature"
+                options:
+                  ipv4:
+                    type: "list"
+                    elements: "str"
+                    required: false
+                    description: "Provide a list of whitelisted source IPv4 address ranges in CIDR notation"
+                  ipv6:
+                    type: "list"
+                    elements: "str"
+                    required: false
+                    description: "Provide a list of whitelisted source IPv6 address ranges in CIDR notation"
+          pipelines:
+            type: "list"
+            elements: "dict"
+            required: true
+            description:
+              - "Provide a list of dictionaries containing pipeline configurations."
+            options:
+
+          plugins:
+            type: "list"
+            elements: "str"
+            required: false
+            description:
+              - "Provide a list of plugins to install and enable."
+              - "The list contains only plugin names as passed to the logstash plugin installer."

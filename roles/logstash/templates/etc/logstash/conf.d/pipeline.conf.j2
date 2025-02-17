@@ -1,0 +1,47 @@
+input {
+  http {
+    port               => {{ logstash.pipeline.input.port | default(8080) }}
+    add_field          => { "[@metadata][input-http]" => "" }
+    user               => "{{ logstash.pipeline.input.username }}"
+    password           => "{{ logstash.pipeline.input.password }}"
+{% if logstash.pipeline.input.ssl is defined %}
+    ssl                => true
+    ssl_certificate    => "{{ logstash.pipeline.input.ssl.certificate }}"
+    ssl_key            => "{{ logstash.pipeline.input.ssl.key }}"
+{% if logstash.pipeline.input.ssl.passphrase is defined and logstash.pipeline.input.ssl.passphrase | length %}
+    ssl_key_passphrase => "{{ logstash.pipeline.input.ssl.passphrase }}"
+{% endif %}
+{% endif %}
+  }
+}
+
+filter {
+  if [@metadata][input-http] {
+    date {
+      match => [ "date", "UNIX" ]
+      remove_field => [ "date" ]
+    }
+    mutate {
+      remove_field => ["headers","host"]
+    }
+  }
+}
+
+output {
+  opensearch {
+    hosts     => ["{{ logstash.pipeline.output.host }}"]
+    auth_type => {
+      type     => "basic"
+      user     => "{{ logstash.pipeline.output.username }}"
+      password => "{{ logstash.pipeline.output.password }}"
+    }
+    ssl_certificate_verification => {{ logstash.pipeline.output.certificate_verification | default("true") }}
+    if "metric" in [tags] {
+        index => "{{ logstash.pipeline.output.index_metrics | default('logstash-metrics-%{+YYYY.MM.dd}') }}"
+    }
+    else {
+        index => "{{ logstash.pipeline.output.index_metrics | default('logstash-logs-%{+YYYY.MM.dd}') }}"
+    }
+    action => "create"
+  }
+}

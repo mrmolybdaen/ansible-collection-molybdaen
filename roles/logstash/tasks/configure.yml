@@ -1,0 +1,74 @@
+---
+
+# Copyright: (c) 2025, Christian Siegel <molybdaen@mr42.org>
+# GNU General Public License v3.0+ (see LICENSE or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+# TODO: Every task in here will notify handlers_systemd_logstash
+
+- name: "configure | Copy static custom GROKs ..."
+  ansible.builtin.copy:
+    src: etc/logstash/custom-groks
+    dest: /etc/logstash/custom-groks
+    owner: root
+    group: root
+    directory_mode: "0755"
+    mode: "0644"
+  notify: handlers_systemd_logstash
+  become: true
+  tags:
+    - logstash
+    - logstash-configure
+
+- name: "configure | Copy dynamic custom GROKS"
+  ansible.builtin.template:
+    src: etc/logstash/custom-groks/grok.j2
+    dest: "/etc/logstash/custom-groks/{{ logstash.grok.customs.name }}"
+    owner: root
+    group: root
+    mode: "0644"
+  notify: handlers_systemd_logstash
+  become: true
+  tags:
+    - logstash
+    - logstash-configure
+
+- name: "configure | Copy general Logstash configuration file ..."
+  ansible.builtin.template:
+    src: etc/logstash/logstash.yml.j2
+    dest: etc/logstash/logstash.yml
+    owner: root
+    group: root
+    mode: "0644"
+  notify: handlers_systemd_logstash
+  become: true
+  tags:
+    - logstash
+    - logstash-configure
+
+- name: "configure | Copy general pipelines configuration ..."
+  ansible.builtin.template:
+    src: etc/logstash/pipelines.yml.j2
+    dest: etc/logstash/pipelines.yml
+    owner: root
+    group: root
+    mode: "0644"
+  notify: handlers_systemd_logstash
+  become: true
+  tags:
+    - logstash
+    - logstash-configure
+
+# TODO: Support for multiple pipelines
+- name: "configure | Copy pipelines ..."
+  ansible.builtin.template:
+    src: etc/logstash/conf.d/pipeline.conf.j2
+    dest: /etc/logstash/conf.d/pipeline.conf
+    owner: root
+    group: root
+    mode: "0644"
+  notify: handlers_systemd_logstash
+  become: true
+  tags:
+    - logstash
+    - logstash-configure
+    - logstash-configure-pipelines

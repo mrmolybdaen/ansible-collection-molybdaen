@@ -1,0 +1,27 @@
+---
+
+# Copyright: (c) 2025, Christian Siegel <molybdaen@mr42.org>
+# GNU General Public License v3.0+ (see LICENSE or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+- name: "systemd | Rollout systemd override configuration ..."
+  ansible.builtin.template:
+    src: etc/systemd/system/logstash.service.d/override.conf
+    dest: etc/systemd/system/logstash.service.d/override.conf
+    owner: root
+    group: root
+    mode: "0644"
+  notify: handlers_systemd_logstash
+  become: true
+  tags:
+    - logstash
+    - logstash-systemd
+
+- name: "systemd | Enable logstash ..."
+  ansible.builtin.systemd_service:
+    name: logstash.service
+    enabled: true
+  notify: handlers_systemd_logstash
+  become: true
+  tags:
+    - logstash
+    - logstash-systemd

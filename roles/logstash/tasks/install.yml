@@ -1,0 +1,22 @@
+---
+
+# Copyright: (c) 2025, Christian Siegel <molybdaen@mr42.org>
+# GNU General Public License v3.0+ (see LICENSE or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+- name: "install | Reload package list ..."
+  ansible.builtin.apt:
+    update_cache: true
+  become: true
+  tags:
+    - logstash
+    - logstash-sources
+    - logstash-install
+
+- name: "install | Install Elastic Logstash ..."
+  ansible.builtin.apt:
+    state: present
+    name: logstash
+  become: true
+  tags:
+    - logstash
+    - logstash-install
