@@ -58,14 +58,16 @@
     - logstash
     - logstash-configure
 
-# TODO: Support for multiple pipelines
 - name: "configure | Copy pipelines ..."
   ansible.builtin.template:
     src: etc/logstash/conf.d/pipeline.conf.j2
-    dest: /etc/logstash/conf.d/pipeline.conf
+    dest: "/etc/logstash/conf.d/{{ pipeline.name }}.conf"
     owner: root
     group: root
     mode: "0644"
+  loop_control:
+    loop_var: pipeline
+  loop: "{{ logstash.pipelines | default([]) }}"
   notify: handlers_systemd_logstash
   become: true
   tags:
