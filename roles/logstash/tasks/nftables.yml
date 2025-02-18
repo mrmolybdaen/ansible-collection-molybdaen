@@ -19,7 +19,7 @@
 - name: "nftables | Copy nftables IPv4 rules ..."
   ansible.builtin.template:
     src: etc/nftables.d/99-logstash-ipv4.app.j2
-    dest: etc/nftables.d/99-logstash-ipv4.app
+    dest: /etc/nftables.d/99-logstash-ipv4.app
     mode: "0644"
     owner: root
     group: root
@@ -32,7 +32,7 @@
 - name: "nftables | Copy nftables IPv6 rules ..."
   ansible.builtin.template:
     src: etc/nftables.d/99-logstash-ipv6.app.j2
-    dest: etc/nftables.d/99-logstash-ipv6.app
+    dest: /etc/nftables.d/99-logstash-ipv6.app
     mode: "0644"
     owner: root
     group: root
