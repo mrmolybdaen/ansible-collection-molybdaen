@@ -1,15 +1,17 @@
 input {
   http {
-    port               => {{ logstash.pipeline.input.port | default(8080) }}
+    port               => {{ pipeline.input.port | default(8080) }}
     add_field          => { "[@metadata][input-http]" => "" }
-    user               => "{{ logstash.pipeline.input.username }}"
-    password           => "{{ logstash.pipeline.input.password }}"
-{% if logstash.pipeline.input.ssl is defined %}
+{% if pipeline.input.username is defined and pipeline.input.username | length and pipeline.input.password is defined and pipeline.input.password | length %}
+    user               => "{{ pipeline.input.username }}"
+    password           => "{{ pipeline.input.password }}"
+{% endif %}
+{% if pipeline.input.ssl is defined %}
     ssl                => true
-    ssl_certificate    => "{{ logstash.pipeline.input.ssl.certificate }}"
-    ssl_key            => "{{ logstash.pipeline.input.ssl.key }}"
-{% if logstash.pipeline.input.ssl.passphrase is defined and logstash.pipeline.input.ssl.passphrase | length %}
-    ssl_key_passphrase => "{{ logstash.pipeline.input.ssl.passphrase }}"
+    ssl_certificate    => "{{ pipeline.input.ssl.certificate }}"
+    ssl_key            => "{{ pipeline.input.ssl.key }}"
+{% if pipeline.input.ssl.passphrase is defined and pipeline.input.ssl.passphrase | length %}
+    ssl_key_passphrase => "{{ pipeline.input.ssl.passphrase }}"
 {% endif %}
 {% endif %}
   }
@@ -28,19 +30,19 @@ filter {
 }
 
 output {
-  opensearch {
-    hosts     => ["{{ logstash.pipeline.output.host }}"]
+  {{ pipeline.output.type }} {
+    hosts     => [{% for host in pipeline.output.hosts %}"{{ host }}"{{ ", " if not loop.last }}{% endfor %}]
     auth_type => {
       type     => "basic"
-      user     => "{{ logstash.pipeline.output.username }}"
-      password => "{{ logstash.pipeline.output.password }}"
+      user     => "{{ pipeline.output.username }}"
+      password => "{{ pipeline.output.password }}"
     }
-    ssl_certificate_verification => {{ logstash.pipeline.output.certificate_verification | default("true") }}
+    ssl_certificate_verification => {{ pipeline.output.certificate_verification | default("true") }}
     if "metric" in [tags] {
-        index => "{{ logstash.pipeline.output.index_metrics | default('logstash-metrics-%{+YYYY.MM.dd}') }}"
+        index => "{{ pipeline.output.index_metrics | default('logstash-metrics-%{+YYYY.MM.dd}') }}"
     }
     else {
-        index => "{{ logstash.pipeline.output.index_metrics | default('logstash-logs-%{+YYYY.MM.dd}') }}"
+        index => "{{ pipeline.output.index_logs | default('logstash-logs-%{+YYYY.MM.dd}') }}"
     }
     action => "create"
   }
