@@ -2,3 +2,27 @@
 
 # Copyright: (c) 2025, Christian Siegel <molybdaen@mr42.org>
 # GNU General Public License v3.0+ (see LICENSE or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+- name: "Import sources configuration ..."
+  ansible.builtin.import_tasks: sources.yml
+  tags:
+    - fluentbit
+    - fluentbit-sources
+
+- name: "Import install tasks ..."
+  ansible.builtin.import_tasks: install.yml
+  tags:
+    - fluentbit
+    - fluentbit-install
+
+- name: "Import configuration tasks ..."
+  ansible.builtin.import_tasks: configure.yml
+  tags:
+    - fluentbit
+    - fluentbit-install
+
+- name: "Import systemd configuration tasks ..."
+  ansible.builtin.import_tasks: systemd.yml
+  tags:
+    - fluentbit
+    - fluentbit-systemd
