@@ -169,12 +169,18 @@ argument_specs:
                   - "logfmt"
                   - "json"
                   - "ltsv"
-          pipeline:
-            type: "dict"
+          pipelines:
+            type: "list"
+            elements: "dict"
             required: true
             description:
               - "Aggregation pipeline configuration."
             options:
+              name:
+                type: "str"
+                required: true
+                description:
+                  - "Name of the pipeline and its main file."
               inputs:
                 type: "list"
                 required: true
