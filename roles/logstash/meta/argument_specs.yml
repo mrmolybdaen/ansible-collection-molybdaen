@@ -159,16 +159,11 @@ argument_specs:
                       - "false"
                     description:
                       - "Enable or disable certificate validation."
-                  index_metrics:
+                  index:
                     type: "str"
                     required: false
                     description:
-                      - "Index or datastream name to use for data ingestion for metrics."
-                  index_logs:
-                    type: "str"
-                    required: false
-                    description:
-                      - "Index or datastream name to use for data ingestion for logs."
+                      - "Index or datastream name to use for data ingestion."
           plugins:
             type: "list"
             elements: "str"

@@ -38,12 +38,7 @@ output {
       password => "{{ pipeline.output.authentication.password }}"
     }
     ssl_certificate_verification => {{ pipeline.output.certificate_verification | default("true") }}
-    if "metric" in [tags] {
-        index => "{{ pipeline.output.index_metrics | default('logstash-metrics-%{+YYYY.MM.dd}') }}"
-    }
-    else {
-        index => "{{ pipeline.output.index_logs | default('logstash-logs-%{+YYYY.MM.dd}') }}"
-    }
+    index => "{{ pipeline.output.index | default('logstash-%{+YYYY.MM.dd}') }}"
     action => "create"
   }
 }
