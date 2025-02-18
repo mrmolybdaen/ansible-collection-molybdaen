@@ -16,7 +16,21 @@
   ansible.builtin.template:
     src: etc/fluent-bit/fluent-bit.yml.j2
     dest: /etc/fluent-bit/fluent-bit.yml
+    mode: "0640"
+    owner: root
+    group: root
   become: true
+  tags:
+    - fluentbit
+    - fluentbit-configuration
+
+- name: "configure | Create symlink for YAML configuration ..."
+  ansible.builtin.file:
+    state: link
+    src: /etc/fluent-bit/fluent-bit.yml
+    dest: /etc/fluent-bit/fluent-bit.conf
+    owner: root
+    group: root
   tags:
     - fluentbit
     - fluentbit-configuration
@@ -73,7 +87,7 @@
 - name: "configure | Deploy additional configuration ..."
   ansible.builtin.template:
     src: "etc/fluent-bit/{{ item }}.yml.j2"
-    dest: "/etc/fluent-bit/{{ item }}.yml.j2"
+    dest: "/etc/fluent-bit/{{ item }}.yml"
     mode: "0644"
     owner: root
     group: root
