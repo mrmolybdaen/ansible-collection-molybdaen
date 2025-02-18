@@ -22,6 +22,7 @@
     owner: root
     group: root
     mode: "0640"
+  notify: handlers_systemd_unit_restart_fluentbit
   become: true
   tags:
     - fluentbit
