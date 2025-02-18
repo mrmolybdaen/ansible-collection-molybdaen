@@ -6,12 +6,20 @@ service:
   grace: {{ fluentbit.service.grace | default(5) }}
   daemon: {{ fluentbit.service.daemon | default('no') }}
   dns.mode: {{ fluentbit.service.dns_mode | default('UDP') }}
-  log_file: {{ fluentbit.service.log.file | default(omit) }}
+{% if fluentbit.service.log.file is defined %}
+  log_file: {{ fluentbit.service.log.file }}
+{% endif %}
   log_level: {{ fluentbit.service.log.level | default('info') }}
-  streams_file: {{ fluentbit.service.streams_file | default(omit) }}
+{% if fluentbit.service.stream_file is defined %}
+  streams_file: {{ fluentbit.service.streams_file }}
+{% endif %}
   http_server: {{ fluentbit.service.http.server | default('off') }}
-  http_listen: {{ fluentbit.service.http.listen | default(omit) }}
-  http_port: {{ fluentbit.service.http.port | default(omit) }}
+{% if fluentbit.service.http.listen is defined %}
+  http_listen: {{ fluentbit.service.http.listen }}
+{% endif %}
+{% if fluentbit.service.http.listen is defined %}
+  http_port: {{ fluentbit.service.http.port }}
+{% endif %}
   coro_stack_size: {{ fluentbit.service.coro_stack_size | default(24576) }}
   scheduler.base: {{ fluentbit.service.scheduler_base | default(5) }}
   scheduler.cap: {{ fluentbit.service.scheduler_cap | default(2000) }}

@@ -88,11 +88,24 @@ parsers:
 {% for parser in fluentbit.parsers | default([]) %}
   - name: {{ parser.name }}
     format: {{ parser.format }}
-    regex: '{{ parser.regex | default(omit) }}'
-    time_key: {{ parser.time_key | default(omit) }}
-    time_format: "{{ parser.time_format | default(omit) }}"
-    time_keep: {{ parser.time_keep | default(omit) }}
-    time_offset: {{ parser.time_offset | default(omit) }}
-    time_system_timezone: {{ parser.time_zone | default(omit) }}
-    time_strict: {{ parser.time_strict | default(omit) }}
+    regex: '{{ parser.regex }}'
+{% endif %}
+{% if parser.time_key is defined %}
+    time_key: {{ parser.time_key }}
+{% endif %}
+{% if parser.time_format is defined %}
+    time_format: "{{ parser.time_format }}"
+{% endif %}
+{% if parser.time_keep is defined %}
+    time_keep: {{ parser.time_keep }}
+{% endif %}
+{% if parser.time_offset is defined %}
+    time_offset: {{ parser.time_offset }}
+{% endif %}
+{% if parser.time_zone is defined %}
+    time_system_timezone: {{ parser.time_zone }}
+{% endif %}
+{% if parser.time_strict is defined %}
+    time_strict: {{ parser.time_strict }}
+{% endif %}
 {% endfor %}
