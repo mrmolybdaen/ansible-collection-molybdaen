@@ -1,6 +1,6 @@
 pipeline:
   inputs:
-{% for input in fluentbit.pipeline.inputs %}
+{% for input in pipeline.inputs %}
     - name: {{ input.type }}
 {% for key,value in input.config.items() %}
 {% if key != 'type' %}
@@ -11,7 +11,7 @@ pipeline:
 {% if fluentbit.pipeline.filters is defined and fluentbit.pipeline.filters | length %}
   filters:
 {% endif %}
-{% for filter in fluentbit.pipeline.filters | default([]) %}
+{% for filter in pipeline.filters | default([]) %}
     - name: {{ filter.type }}
 {% for key,value in filter.config.items() %}
 {% if key != 'type' %}
@@ -20,7 +20,7 @@ pipeline:
 {% endfor %}
 {% endfor %}
   outputs:
-{% for output in fluentbit.pipeline.outputs %}
+{% for output in pipeline.outputs %}
     - name: {{ output.type }}
 {% for key,value in output.config.items() %}
 {% if key != 'type' %}
