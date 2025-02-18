@@ -31,6 +31,7 @@
     dest: /etc/fluent-bit/fluent-bit.conf
     owner: root
     group: root
+  become: true
   tags:
     - fluentbit
     - fluentbit-configuration
