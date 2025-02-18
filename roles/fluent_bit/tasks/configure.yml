@@ -25,18 +25,6 @@
     - fluentbit
     - fluentbit-configuration
 
-- name: "configure | Create symlink for YAML configuration ..."
-  ansible.builtin.file:
-    state: link
-    src: /etc/fluent-bit/fluent-bit.yml
-    dest: /etc/fluent-bit/fluent-bit.conf
-    owner: root
-    group: root
-  become: true
-  tags:
-    - fluentbit
-    - fluentbit-configuration
-
 - name: "configure | Create configuration subdirectories ..."
   ansible.builtin.file:
     state: directory

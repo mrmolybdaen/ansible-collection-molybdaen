@@ -15,6 +15,18 @@
     - fluentbit
     - fluentbit-systemd
 
+- name: "systemd | Copy overrides file ..."
+  ansible.builtin.template:
+    src: "etc/systemd/system/fluent-bit.service.d/override.conf.j2"
+    dest: "/etc/systemd/system/fluent-bit.service.d/override.conf"
+    owner: root
+    group: root
+    mode: "0640"
+  become: true
+  tags:
+    - fluentbit
+    - fluentbit-systemd
+
 - name: "systemd | Enable and start Fluent Bit service ..."
   ansible.builtin.systemd:
     name: fluent-bit.service
