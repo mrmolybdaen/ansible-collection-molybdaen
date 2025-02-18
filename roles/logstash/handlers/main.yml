@@ -9,3 +9,4 @@
     state: restarted
     enabled: true
   listen: handlers_systemd_logstash
+  become: true
