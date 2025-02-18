@@ -20,6 +20,7 @@
     - logstash-configure
 
 - name: "configure | Copy dynamic custom GROKS"
+  when: logstash.grok.customs is defined
   ansible.builtin.template:
     src: etc/logstash/custom-groks/grok.j2
     dest: "/etc/logstash/custom-groks/{{ logstash.grok.customs.name }}"
@@ -35,7 +36,7 @@
 - name: "configure | Copy general Logstash configuration file ..."
   ansible.builtin.template:
     src: etc/logstash/logstash.yml.j2
-    dest: etc/logstash/logstash.yml
+    dest: /etc/logstash/logstash.yml
     owner: root
     group: root
     mode: "0644"
@@ -48,7 +49,7 @@
 - name: "configure | Copy general pipelines configuration ..."
   ansible.builtin.template:
     src: etc/logstash/pipelines.yml.j2
-    dest: etc/logstash/pipelines.yml
+    dest: /etc/logstash/pipelines.yml
     owner: root
     group: root
     mode: "0644"
