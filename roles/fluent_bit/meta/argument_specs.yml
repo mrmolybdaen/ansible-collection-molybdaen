@@ -236,7 +236,7 @@ argument_specs:
                       - "Define the input type here."
               filters:
                 type: "list"
-                required: true
+                required: false
                 elements: "dict"
                 options:
                   config:

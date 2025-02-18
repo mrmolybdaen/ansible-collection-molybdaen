@@ -8,8 +8,10 @@ pipeline:
 {% endif %}
 {% endfor %}
 {% endfor %}
+{% if fluentbit.pipeline.filters is defined and fluentbit.pipeline.filters | length %}
   filters:
-{% for filter in fluentbit.pipeline.filters %}
+{% endif %}
+{% for filter in fluentbit.pipeline.filters | default([]) %}
     - name: {{ filter.type }}
 {% for key,value in filter.config.items() %}
 {% if key != 'type' %}
