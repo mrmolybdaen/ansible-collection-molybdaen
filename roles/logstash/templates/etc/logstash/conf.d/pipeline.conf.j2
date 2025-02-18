@@ -33,9 +33,9 @@ output {
   {{ pipeline.output.type }} {
     hosts     => [{% for host in pipeline.output.hosts %}"{{ host }}"{{ ", " if not loop.last }}{% endfor %}]
     auth_type => {
-      type     => "basic"
-      user     => "{{ pipeline.output.username }}"
-      password => "{{ pipeline.output.password }}"
+      type     => "{{ pipeline.output.authentication.type }}"
+      user     => "{{ pipeline.output.authentication.username }}"
+      password => "{{ pipeline.output.authentication.password }}"
     }
     ssl_certificate_verification => {{ pipeline.output.certificate_verification | default("true") }}
     if "metric" in [tags] {
