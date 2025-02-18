@@ -18,7 +18,7 @@ Port 22
 Port {{ openssh_port }}
 {% endif %}
 AddressFamily {{ openssh_addr_family | default('any') }}
-{% if openssh_addr_family in ['any', 'inet'] %}
+{% if openssh_addr_family is not defined or openssh_addr_family in ['any', 'inet'] %}
 {% if openssh_addresses_ipv4 is defined and openssh_addresses_ipv4|length %}
 {% for ip in openssh_addresses_ipv4%}
 ListenAddress {{ ip }}
@@ -27,7 +27,7 @@ ListenAddress {{ ip }}
 ListenAddress 0.0.0.0
 {% endif %}
 {% endif %}
-{% if openssh_addr_family in ['any', 'inet6'] %}
+{% if openssh_addr_family is not defined or openssh_addr_family in ['any', 'inet6'] %}
 {% if openssh_addresses_ipv6 is defined and openssh_addresses_ipv6|length %}
 {% for ip in openssh_addresses_ipv6%}
 ListenAddress {{ ip }}
