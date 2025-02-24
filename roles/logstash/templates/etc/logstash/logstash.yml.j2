@@ -319,7 +319,7 @@ pipeline.separate_logs: true
 #
 # Determine where to allocate memory buffers, for plugins that leverage them.
 # Default to direct, optionally can be switched to heap to select Java heap space.
-# pipeline.buffer.type: heap
+pipeline.buffer.type: {{ logstash.buffer.type | default("direct") }}
 #
 #
 # X-Pack Management
