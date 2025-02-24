@@ -20,6 +20,34 @@ argument_specs:
         type: "dict"
         required: true
         options:
+          api:
+            type: "dict"
+            required: false
+            description:
+              - "Provide general configuration options."
+            options:
+              http:
+                type: "dict"
+                required: false
+                description: "Provide HTTP configuration."
+                options:
+                  host:
+                    type: "str"
+                    required: false
+                    description:
+                      - "IP address or hostname for HTTP API."
+                      - "Defaults to C(127.0.0.1) in templates."
+                  port:
+                    type: "str"
+                    required: false
+                    description:
+                      - "Port or port range to assign the HTTP API to."
+                      - "Use C(9600) or C(9600-9700) to specifiy port range."
+                  environment:
+                    type: "str"
+                    required: false
+                    description:
+                      - "Provide a customizable environment name."
           version:
             type: "int"
             required: true
