@@ -2,7 +2,7 @@
 _meta:
   type: "internalusers"
   config_version: 2
-{{ opensearch.intrnal_users.admin.name | default("admin") }}:
+{{ opensearch.internal_users.admin.name | default("admin") }}:
   hash: "{{ opensearch.internal_users.admin.password | ansible.builtin.password_hash(hashtype='bcrypt') }}"
   reserved: true
   backend_roles:
