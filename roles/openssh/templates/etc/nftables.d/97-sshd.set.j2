@@ -7,7 +7,7 @@ set sshd-v4-acl {
     elements = {
         127.0.0.1,
 {% for ip in openssh_whitelist_ipv4 if openssh_whitelist_ipv4 is defined and openssh_whitelist_ipv4|length %}
-        {{ ip }}
+        {{ ip }}{{ "," if not loop.last }}
 {% endfor %}
     }
 }
@@ -18,7 +18,7 @@ set sshd-v6-acl {
     elements = {
         ::1,
 {% for ip in openssh_whitelist_ipv6 if openssh_whitelist_ipv6 is defined and openssh_whitelist_ipv6|length %}
-        {{ ip }}
+        {{ ip }}{{ "," if not loop.last }}
 {% endfor %}
     }
 }
