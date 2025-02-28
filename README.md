@@ -1,6 +1,6 @@
-# Ansible Collection - mrmolybdaen.molybdaen
+# Ansible Collection - mrmolybdaen.git
 
-This collection is a result of my work. It aims to standardize deployments of Debian based web servers, mostly LAMP stacks.
+This collection provides installation and configuration tasks for different Gitlab CE and Gitlab Runner setups.
 
 The aim of this collection is to move from Infrastructure as Code (IaC) to a Configuration as Code like model as well.
 This means host variables can be used to create YAML based configuration which will get translated via Jinja2 templates
@@ -12,18 +12,10 @@ Security is oriented on CIS benchmarks where available and is mostly optimized f
 > If your servers are running in an environment with high confidentiality, such as medical, finance, universities or
 > military sectors, you need to apply additional measures and may override some roles.
 
-> **WARNING:**
-> This role makes use of external repositories for MariaDB (from MariaDB maintainers), Apach2 and PHP (deb.sury.org) as
-> well as Nginx (nginx repos) and ISC BIND9 to provide all security relevant patches as well as feature updates.
-> This can be disabled via `maintainer_repositories: false`. If you do not define this variable it is handled as `true`.
-
 Some roles focus on basic configuration and hardening which is not configurable.
 Where possible we use, aside of apparmor, Systemd unit overrides to secure processes. This adds another layer of security
 because Systemd will start processes which already have limited capabilities.
 
-> **NOTE**:
-> All roles providing networking services depend on the `nftables` role so no extra firewall frontend is needed.
-> Any service providing networking services (such as Nginx, Apache2 or OpenSearch) will provide its own ruleset.
 
 Collection documentation can be found here:
 
@@ -62,9 +54,3 @@ Talking about pipelines, we run sanity, unit and integration tests in a pre-buil
 and actual deployments in a post-build stage.
 
 ## Roles and Playbooks
-
-Playbooks are prefixed with `playbook_` all the time.
-Most playbooks assume you want to configure a whole host. If you only need to run a specific role, then use tags.
-All roles use tags with their names.
-For example, if you want to run the `mrmolybdaen.molybdaen.opensearch` role from the playbook, use:
-```:~$ ansible-playbook mrmolybdaen.molybdaen.playbook_opensearch --tags opensearch --limit <opensearch-node>```

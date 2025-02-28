@@ -1,8 +1,0 @@
-## Record changes to network env files or syscalls
--a always,exit -F arch=b64 -S sethostname,setdomainname -k system_locale
--a always,exit -F arch=b32 -S sethostname,setdomainname -k system_locale
--w /etc/issue -p wa -k system_locale
--w /etc/issue.net -p wa -k system_locale
--w /etc/hosts -p wa -k system_locale
--w /etc/networks -p wa -k system_locale
--w /etc/network/ -p wa -k system_locale

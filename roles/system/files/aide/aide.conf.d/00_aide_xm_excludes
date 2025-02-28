@@ -1,6 +1,0 @@
-!/home/(?:csi|xima)/.* 0
-!/mnt/backup/.* 0
-!/root/.* 0
-!/tmp/.* 0
-!/var/log/.* 0
-!/var/www/html/.* 0

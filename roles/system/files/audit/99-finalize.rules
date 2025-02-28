@@ -1,2 +1,0 @@
-# Make audit rules immutable unless system reboot
--e 2

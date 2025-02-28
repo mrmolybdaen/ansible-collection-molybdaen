@@ -1,3 +1,0 @@
-# Allow access for http clients to visit Dashboards application
-
-ip6 saddr @opensearch-dashboards-v6-acl tcp dport {{ opensearch_dashboards.server.port | default(5601) }} accept
