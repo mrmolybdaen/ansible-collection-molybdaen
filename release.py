@@ -21,6 +21,7 @@ def main():
     parser.add_argument("-a", "--author", required=False, default=None, help="Author")
     parser.add_argument("-i", "--issues", required=False, default=None, help="Issue URI")
     parser.add_argument("-g", "--repository", required=False, default=None, help="Repository URI")
+    parser.add_argument("-c", "--collection", required=True, default=None, help="Collection name")
     parser.add_argument(
         "-d", "--documentation", required=False, default=None, help="Documentation URI, defaults to repository"
     )
@@ -32,6 +33,7 @@ def main():
     template_path = args.template
     release = args.release
     author = args.author
+    collection = args.collection
     if not author:
         author = "James T. Kirk"
     email = args.email
@@ -61,6 +63,7 @@ def main():
         docs=docs,
         homepage=home,
         repo=repo,
+        collection=collection,
     )
 
     # Save generated galaxy.yml

@@ -1,0 +1,7 @@
+{% if fluentbit.streams is defined and fluentbit.streams | length %}
+# List of paths to dynamically linked libraries
+plugins:
+{% for plugin in fluentbit.streams %}
+  - {{ plugin.path }}
+{% endfor %}
+{% endif %}

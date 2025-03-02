@@ -1,0 +1,3 @@
+{% for key,value in logstash.grok.customs.list | default([]) %}
+{{ key }} {{ value }}
+{% endfor %}

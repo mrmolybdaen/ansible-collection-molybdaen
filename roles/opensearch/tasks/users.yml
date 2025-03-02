@@ -1,0 +1,114 @@
+---
+
+# Copyright: (c) 2025, Christian Siegel <molybdaen@mr42.org>
+# GNU General Public License v3.0+ (see LICENSE or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+- name: "users | Create action groups ..."
+  ansible.builtin.uri:
+    url: "{{ opensearch_url | default('https://localhost:9200') }}/_plugins/_security/api/actiongroups/{{ opensearch_actiongroup.name }}"
+    url_username: "{{ opensearch_admin_user }}"
+    url_password: "{{ opensearch_admin_password }}"
+    method: "{{ opensearch_actiongroup.method | default('PUT') }}"
+    validate_certs: "{{ opensearch_validate_certs | default(true) }}"
+    body_format: json
+    status_code:
+      - 200
+      - 201
+      - 202
+    body:
+      allowed_actions: "{{ opensearch_actiongroup.actions | default([]) }}"
+  loop: "{{ opensearch_api_actiongroups | default([]) }}"
+  loop_control:
+    index_var: opensearch_actiongroup_index
+    loop_var: opensearch_actiongroup
+  tags:
+    - opensearch
+    - opensearch-users
+    - opensearch-actiongroups
+
+- name: "users | Create custom roles ..."
+  ansible.builtin.uri:
+    url: "{{ opensearch_url | default('https://localhost:9200') }}/_plugins/_security/api/roles/{{ opensearch_role.name }}"
+    url_username: "{{ opensearch_admin_user }}"
+    url_password: "{{ opensearch_admin_password }}"
+    method: "{{ opensearch_role.method | default('PUT') }}"
+    validate_certs: "{{ opensearch_validate_certs | default(true) }}"
+    body_format: json
+    status_code:
+      - 200
+      - 201
+      - 202
+    body:
+      hidden: "{{ opensearch_role.hidden | default(omit) }}"
+      reserved: "{{ opensearch_role.reserved | default(omit) }}"
+      cluster_permissions: "{{ opensearch_role.cluster_permissions | default(omit) }}"
+      index_permissions: "{{ opensearch_role.index_permissions | default(omit) }}"
+      tenant_permissions: "{{ opensearch_role.tenant_permissions | default(omit) }}"
+  loop: "{{ opensearch_api_roles | default([]) }}"
+  loop_control:
+    index_var: opensearch_role_index
+    loop_var: opensearch_role
+  tags:
+    - opensearch
+    - opensearch-users
+    - opensearch-roles
+
+- name: "users | Create user with permissions ..."
+  ansible.builtin.uri:
+    url: "{{ opensearch_url | default('https://localhost:9200') }}/_plugins/_security/api/internalusers/{{ opensearch_user.name }}"
+    url_username: "{{ opensearch_admin_user }}"
+    url_password: "{{ opensearch_admin_password }}"
+    method: "{{ opensearch_user.method | default('PUT') }}"
+    validate_certs: "{{ opensearch_validate_certs | default(true) }}"
+    body_format: json
+    status_code:
+      - 200
+      - 201
+      - 202
+    body:
+      # An alternative to hash would be password. Using password would hash the password by OpenSearch
+      # However, leaking a hash in a log leaves enough time to change the password before someone can
+      # decrypt the hash.
+      # OpenSearch currently uses Bcrypt for hashing.
+      reserved: "{{ opensearch_user.reserved | default(omit) }}"
+      hidden: "{{ opensearch_user.hidden | default(omit) }}"
+      hash: "{{ opensearch_user.password | ansible.builtin.password_hash(hashtype='bcrypt') }}"
+      opendistro_security_roles: "{{ opensearch_user.opendistro_security_roles | default(omit) }}"
+      backend_roles: "{{ opensearch_user.backend_roles | default(omit) }}"
+      attributes: "{{ opensearch_user.attributes | default(omit) }}"
+  no_log: false
+  loop: "{{ opensearch_api_users | default([]) }}"
+  loop_control:
+    index_var: opensearch_user_index
+    loop_var: opensearch_user
+  tags:
+    - opensearch
+    - opensearch-users
+
+- name: "users | Create or update role mappings ..."
+  ansible.builtin.uri:
+    url: "{{ opensearch_url | default('https://localhost:9200') }}/_plugins/_security/api/rolesmapping/{{ opensearch_rolesmapping.name }}"
+    url_username: "{{ opensearch_admin_user }}"
+    url_password: "{{ opensearch_admin_password }}"
+    method: "{{ opensearch_user.method | default('PUT') }}"
+    validate_certs: "{{ opensearch_validate_certs | default(true) }}"
+    body_format: json
+    status_code:
+      - 200
+      - 201
+      - 202
+    body:
+      # An alternative to hash would be password. Using password would hash the password by OpenSearch
+      # However, leaking a hash in a log leaves enough time to change the password before someone can
+      # decrypt the hash.
+      # OpenSearch currently uses Bcrypt for hashing.
+      backend_roles: "{{ opensearch_rolesmapping.backend_roles | default(omit) }}"
+      hosts: "{{ opensearch_rolesmapping.hosts | default(['*']) }}"
+      users: "{{ opensearch_rolesmapping.users | default(omit) }}"
+  loop: "{{ opensearch_api_rolesmappings | default([]) }}"
+  loop_control:
+    index_var: opensearch_rolesmapping_index
+    loop_var: opensearch_rolesmapping
+  tags:
+    - opensearch
+    - opensearch-users

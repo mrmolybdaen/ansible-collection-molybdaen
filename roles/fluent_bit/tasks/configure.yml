@@ -1,0 +1,95 @@
+---
+
+# Copyright: (c) 2025, Christian Siegel <molybdaen@mr42.org>
+# GNU General Public License v3.0+ (see LICENSE or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+- name: "configure | Remove classic configuration ..."
+  ansible.builtin.file:
+    state: absent
+    path: "/etc/fluent-bit/fluent-bit.conf"
+  become: true
+  tags:
+    - fluentbit
+    - fluentbit-configuration
+
+- name: "configure | Create main configuration file ..."
+  ansible.builtin.template:
+    src: etc/fluent-bit/fluent-bit.yml.j2
+    dest: /etc/fluent-bit/fluent-bit.yml
+    mode: "0640"
+    owner: root
+    group: root
+  notify: handlers_systemd_unit_restart_fluentbit
+  become: true
+  tags:
+    - fluentbit
+    - fluentbit-configuration
+
+- name: "configure | Create configuration subdirectories ..."
+  ansible.builtin.file:
+    state: directory
+    path: "/etc/fluent-bit/{{ item }}"
+    owner: root
+    group: root
+    mode: "0750"
+  loop:
+    - "parsers"
+    - "pipelines"
+    - "processors"
+  notify: handlers_systemd_unit_restart_fluentbit
+  become: true
+  tags:
+    - fluentbit
+    - fluentbit-configuration
+
+
+- name: "configure | Deploy parser configuration"
+  ansible.builtin.template:
+    src: etc/fluent-bit/parsers.yml.j2
+    dest: "/etc/fluent-bit/parsers/{{ parser.name }}.yml"
+    owner: root
+    group: root
+    mode: "0640"
+  loop: "{{ fluentbit.parsers | default([]) }}"
+  loop_control:
+    loop_var: parser
+  notify: handlers_systemd_unit_restart_fluentbit
+  become: true
+  tags:
+    - fluentbit
+    - fluentbit-configuration
+    - fluentbit-configuration-parsers
+
+- name: "configure | Deploy pipeline configuration"
+  ansible.builtin.template:
+    src: etc/fluent-bit/pipelines.yml.j2
+    dest: "/etc/fluent-bit/pipelines/{{ pipeline.name }}.yml"
+    owner: root
+    group: root
+    mode: "0640"
+  loop: "{{ fluentbit.pipelines | default([]) }}"
+  loop_control:
+    loop_var: pipeline
+  notify: handlers_systemd_unit_restart_fluentbit
+  become: true
+  tags:
+    - fluentbit
+    - fluentbit-configuration
+    - fluentbit-configuration-pipelines
+
+- name: "configure | Deploy additional configuration ..."
+  ansible.builtin.template:
+    src: "etc/fluent-bit/{{ item }}.yml.j2"
+    dest: "/etc/fluent-bit/{{ item }}.yml"
+    mode: "0644"
+    owner: root
+    group: root
+  loop:
+    - "env"
+    - "plugins"
+    - "streams"
+  notify: handlers_systemd_unit_restart_fluentbit
+  become: true
+  tags:
+    - fluentbit
+    - fluentbit-configuration

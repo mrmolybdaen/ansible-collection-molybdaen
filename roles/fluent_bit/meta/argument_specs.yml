@@ -1,0 +1,325 @@
+---
+
+# Copyright: (c) 2025, Christian Siegel <molybdaen@mr42.org>
+# GNU General Public License v3.0+ (see LICENSE or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+argument_specs:
+  main:
+    short_description: "Fluent Bit log and metrics aggregation."
+    description:
+      - "Configure fluentbit for log and metrics aggregation on VMs and servers."
+    author: Christian Siegel
+    options:
+      fluentbit:
+        type: "dict"
+        required: true
+        description:
+          - "Fluent Bit configuration dictionary"
+        options:
+          envs:
+            type: "dict"
+            required: false
+            description:
+              - "Define a dictionary of environment variables used in Fluent Bit."
+          service:
+            type: "dict"
+            required: false
+            description:
+              - "Base configuration of Fluent Bit."
+            options:
+              flush:
+                type: "int"
+                required: false
+                description:
+                  - "Sets the flush time in seconds.nanoseconds."
+                  - "The engine loop uses a flush timeout to determine when to flush records ingested by input plugins to output plugins."
+              grace:
+                type: "int"
+                required: false
+                description:
+                  - "Sets the grace time in seconds as an integer value."
+                  - "The engine loop uses a grace timeout to define the wait time before exiting."
+              daemon:
+                type: "str"
+                required: false
+                choices:
+                  - "on"
+                  - "off"
+                  - "yes"
+                  - "no"
+                description:
+                  - "Specify whether Fluent Bit will run in Daemon mode."
+                  - "Should be off in Systemd based systems."
+              dns_mode:
+                type: "str"
+                required: false
+                choices:
+                  - "UDP"
+                  - "TCP"
+                description:
+                  - "Sets the primary transport layer protocol used by the asynchronous DNS resolver."
+              log_file:
+                type: "str"
+                required: false
+                description:
+                  - "Path to log file."
+              log_level:
+                type: "str"
+                required: false
+                description:
+                  - "Specify the log level."
+                choices:
+                  - "off"
+                  - "error"
+                  - "warn"
+                  - "info"
+                  - "debug"
+                  - "trace"
+              http:
+                type: "dict"
+                required: false
+                description:
+                  - "Configure HTTP endpoint."
+                options:
+                  server:
+                    type: "str"
+                    choices:
+                      - "on"
+                      - "off"
+                    required: true
+                    description:
+                      - "Enable or disable server functionality."
+                  listen:
+                    type: "str"
+                    required: true
+                    description:
+                      - "Address to bind endpoint to."
+                  port:
+                    type: "int"
+                    required: true
+                    description:
+                      - "Port to bind endpoint to."
+              coro_stack_size:
+                type: "int"
+                required: false
+                description:
+                  - "Sets the coroutine stack size in bytes."
+                  - "The value must be greater than the page size of the running system."
+                  - "Setting the value too small (4096) can cause coroutine threads to overrun the stack buffer."
+                  - "The default value of this parameter should not be changed."
+              scheduler_base:
+                type: "int"
+                required: false
+                description:
+                  - "Sets the base of exponential backoff. "
+              scheduler_cap:
+                type: "int"
+                required: false
+                description:
+                  - "Sets a maximum retry time in seconds."
+              json_nan2null:
+                type: "str"
+                required: false
+                choices:
+                  - "true"
+                  - "false"
+                description:
+                  - "If enabled, NaN is converted to null when Fluent Bit converts msgpack to json."
+              sp_str2num:
+                type: "int"
+                choices:
+                  - "true"
+                  - "false"
+                required: false
+                description:
+                  - "If enabled, the Stream Processor converts strings that represent numbers to a numeric type."
+          plugins:
+            type: "list"
+            required: false
+            elements: "str"
+            description:
+              - "List of path to dynamically linked libraries (*.so)."
+          streams:
+            type: "list"
+            required: false
+            elements: "dict"
+            description:
+              - "List of stream configurations"
+          parsers:
+            type: "list"
+            elements: "dict"
+            required: false
+            description:
+              - "Define a custom parser for custom logs."
+            options:
+              name:
+                type: "str"
+                required: true
+                description:
+                  - "Define a name for the custom parser. Make sure to avoid the following names:"
+                  - "apache2, apache2_error, nginx, k8s_nginx_ingress, json, logfmt, docker, docker-daemon, syslog-rfc5424, syslog-rfc3164-local, syslog-rfc3164, mongodb, envoy, istio-envoy-proxy, cri, kube-custom"
+              format:
+                type: "str"
+                required: true
+                description:
+                  - "You must define the format of a parser."
+                  - "When choosing C('regex'), one must define the O(regex) option including the regex."
+                choices:
+                  - "regex"
+                  - "logfmt"
+                  - "json"
+                  - "ltsv"
+          pipelines:
+            type: "list"
+            elements: "dict"
+            required: true
+            description:
+              - "Aggregation pipeline configuration."
+            options:
+              name:
+                type: "str"
+                required: true
+                description:
+                  - "Name of the pipeline and its main file."
+              inputs:
+                type: "list"
+                required: true
+                elements: "dict"
+                description:
+                  - "A list of inputs to forward to outputs"
+                  - "For a list of input plugins and their configuration visit the (Fluent Bit documentation)[https://docs.fluentbit.io/manual/pipeline/inputs]"
+                options:
+                  config:
+                    type: "dict"
+                    required: true
+                    description:
+                      - "A dictionary of key-value pairs to configure the output plugin."
+                  type:
+                    type: "str"
+                    required: true
+                    choices:
+                      - "collectd"
+                      - "cpu"
+                      - "disk"
+                      - "docker_events"
+                      - "docker"
+                      - "dummy"
+                      - "elasticsearch"
+                      - "exec"
+                      - "wasi"
+                      - "ebpf"
+                      - "fluentbit_metrics"
+                      - "forward"
+                      - "head"
+                      - "health"
+                      - "http"
+                      - "kafka"
+                      - "kmsg"
+                      - "kubernetes_events"
+                      - "mem"
+                      - "mqtt"
+                      - "netif"
+                      - "nginx_metrics"
+                      - "node_exporter_metrics"
+                      - "opentelemetry"
+                      - "podman_metrics"
+                      - "process_exporter_metrics"
+                      - "proc"
+                      - "prometheus_remote_write"
+                      - "prometheus_scrape"
+                      - "random"
+                      - "serial"
+                      - "splunk"
+                      - "statsd"
+                      - "stdin"
+                      - "syslog"
+                      - "systemd"
+                      - "tail"
+                      - "tcp"
+                      - "thermal"
+                      - "udp"
+                    description:
+                      - "Define the input type here."
+              filters:
+                type: "list"
+                required: false
+                elements: "dict"
+                options:
+                  config:
+                    type: "dict"
+                    required: true
+                    description:
+                      - "A dictionary of key-value pairs to configure the filter plugin."
+                  type:
+                    type: "str"
+                    required: true
+                    description:
+                      - "The filter plugin to use."
+                    choices:
+                      - "aws"
+                      - "checklist"
+                      - "ecs"
+                      - "geoip2"
+                      - "grep"
+                      - "kubernetes"
+                      - "log_to_metrics"
+                      - "lua"
+                      - "parser"
+                      - "record_modifier"
+                      - "modify"
+                      - "multiline"
+                      - "nest"
+                      - "nightfall"
+                      - "rewrite_tag"
+                      - "stdout"
+                      - "sysinfo"
+                      - "throttle"
+                      - "type_converter"
+                      - "tensorflow"
+                      - "wasm"
+              outputs:
+                type: "list"
+                required: true
+                elements: "dict"
+                description:
+                  - "A list of outputs"
+                  - "For a list of input plugins and their configuration visit the (Fluent Bit documentation)[https://docs.fluentbit.io/manual/pipeline/outputs]"
+                options:
+                  config:
+                    type: "dict"
+                    required: true
+                    description:
+                      - "A dictionary of key-value pairs to configure the output plugin."
+                  type:
+                    type: "str"
+                    required: true
+                    choices:
+                      - "cloudwatch_logs"
+                      - "kinesis_firehose"
+                      - "kinesis_streams"
+                      - "s3"
+                      - "azure_blob"
+                      - "azure_kusto"
+                      - "azure"
+                      - "azure_logs_ingestion"
+                      - "counter"
+                      - "opentelemetry"
+                      - "datadog"
+                      - "http"
+                      - "es"
+                      - "flowcounter"
+                      - "forward"
+                      - "gelf"
+                      - "chronicle"
+                      - "bigquery"
+                      - "influxdb"
+                      - "kasfka-rest"
+                      - "logdna"
+                      - "nrlogs"
+                      - "null"
+                      - "opensearch"
+                      - "pgsql"
+                      - "prometheus_exporter"
+                      - "splunk"
+                    description:
+                      - "Output plugin name"

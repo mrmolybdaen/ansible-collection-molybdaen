@@ -195,3 +195,5 @@ test.sh
 docs
 docs/*
 docs/.*
+galaxy.yml
+galaxy.yaml

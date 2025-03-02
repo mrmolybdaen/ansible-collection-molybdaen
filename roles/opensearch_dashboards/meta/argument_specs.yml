@@ -1,0 +1,345 @@
+---
+
+# Copyright: (c) 2025, Christian Siegel <molybdaen@mr42.org>
+# GNU General Public License v3.0+ (see LICENSE or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+argument_specs:
+  main:
+    short_description: "Install OpenSearch Dashboards application for monitoring"
+    description:
+      - "Install OpenSearch Dashboards"
+      - "Configure basic dashboards and alerting"
+      - "You need an OpenSearch cluster before rolling out this role."
+      - "You can either define users necessary for OpenSearch Dashboards using the opensearch role, or specifying your users here."
+    author: Christian Siegel
+    options:
+      opensearch_dashboards:
+        type: "dict"
+        required: false
+        description:
+          - "Dictionary containing the OpenSearch Dashboards instance configuration."
+        options:
+          version:
+            type: "str"
+            required: false
+            description:
+              - "OpenSearch version branch"
+          server:
+            type: "dict"
+            required: false
+            description:
+              - "Dictionary providing Dashboards server configuration"
+            options:
+              port:
+                type: "int"
+                required: false
+                description:
+                  - "This is the bind port for OpenSearch Dashboards."
+                  - "Templates default to C(5601)"
+              host:
+                type: "str"
+                required: false
+                description:
+                  - "This is the bind address for OpenSearch Dashboards."
+                  - "Templates default to C('localhost')"
+              base_path:
+                type: "str"
+                required: false
+                description:
+                  - "Set a custom base path. This cannot end in a slash!"
+              rewrite_base_path:
+                type: "str"
+                choices:
+                  - "true"
+                  - "false"
+                required: false
+                description:
+                  - "Specify whether to rewrite requests prefixed with the base path will be rewritten by the Dashboards or a reverse proxy."
+              max_payload_bytes:
+                type: "int"
+                required: false
+                description:
+                  - "Maximum size of the payload for a request against the Dashboards server."
+                  - "Templates default to C(10485760)"
+              name:
+                type: "str"
+                required: false
+                description:
+                  - "Display name of the Dashboards server."
+                  - "Templates default to C(inventory_hostname) magic variable."
+              ssl:
+                type: "dict"
+                required: false
+                description:
+                  - "Define sub keys to enable TLS with OpenSearch Dashboards directly."
+                  - "If not set, Dashboards configuration setting C(server.ssl.enabled) will be set to false."
+                options:
+                  certificate:
+                    type: "str"
+                    required: true
+                    description:
+                      - "Path to the TLS certificate."
+                  key:
+                    type: "str"
+                    required: true
+                    description:
+                      - "Path to the TLS certificate key."
+          dashboards:
+            type: "dict"
+            required: false
+            description:
+              - "This contains all dashboards application options."
+            options:
+              index:
+                type: "str"
+                required: false
+                description:
+                  - "Define the index name for OpenSearch Dashboards."
+              default_app_id:
+                type: "str"
+                required: false
+                description:
+                  - "Define the default app the user sees after login."
+          opensearch:
+            type: "dict"
+            required: true
+            description:
+              - "This dictionary contains information for the OpenSearch instance the Dashboards application connects to."
+            options:
+              admin:
+                type: "dict"
+                required: false
+                description:
+                  - "If you create users within this role, specify an OpenSearch administrative user to use."
+                options:
+                  instance:
+                    type: "str"
+                    required: false
+                    description:
+                      - "Primary node of the OpenSearch cluster. Specify if URL is different form https://localhost:9200."
+                  name:
+                    type: "str"
+                    required: false
+                    default: 'admin'
+                    description:
+                      - "Name of an administrative user of OpenSearch."
+                      - "Must be defined if this role creates Dashboards users."
+                  password:
+                    type: "str"
+                    required: false
+                    description:
+                      - "Password of the administrative user of OpenSearch."
+                      - "Must be defined if this role creates Dashboards users."
+                  validate_certs:
+                    type: "str"
+                    choices:
+                      - "true"
+                      - "false"
+                    required: false
+                    description:
+                      - "Specify whether to validate or not to validate certificates of the OpenSearch node when running requests against the API."
+              instance_list:
+                type: "list"
+                elements: "str"
+                required: false
+                description:
+                  - "List of URLs of OpenSearch instances to connect to."
+                  - "For example C('http://localhost:9200')"
+              connection_user_name:
+                type: "str"
+                required: true
+                description:
+                  - "Username for OpenSearch Dashboards to authenticate with OpenSearch."
+              connection_user_password:
+                type: "str"
+                required: true
+                description:
+                  - "Password for OpenSearch Dashboards to authenticate with OpenSearch."
+              timeout:
+                type: "dict"
+                required: false
+                description:
+                  - "Specify different timeouts."
+                options:
+                  ping:
+                    type: "int"
+                    required: false
+                    description:
+                      - "Ping timeout."
+                  request:
+                    type: "int"
+                    required: false
+                    description:
+                      - "Request timeout."
+                  shard:
+                    type: "int"
+                    required: false
+                    description:
+                      - "Shard timeout."
+              ssl:
+                type: "dict"
+                required: false
+                description:
+                  - "TLS/SSL configuration options"
+                options:
+                  verification_mode:
+                    type: "str"
+                    required: false
+                    choices:
+                      - "full"
+                      - "none"
+                    description:
+                      - "Define if certificates will be checked or not."
+                      - "In templates this defaults to C('full')"
+                  ca_list:
+                    type: "list"
+                    elements: "str"
+                    description:
+                      - "A list of paths to CA files on the Dashboards host."
+                      - "Uses PEM format."
+                      - "NOTE: This role will not deploy those files!"
+              cookie_secure:
+                type: "str"
+                required: false
+                choices:
+                  - "true"
+                  - "false"
+                description:
+                  - "Set this to false if OpenSearch Dashboards is running without HTTPS."
+              readonly_roles:
+                type: "list"
+                elements: "str"
+                required: false
+                description:
+                  - "Define the roles for OpenSearch Dashboards read-only access."
+              tenants:
+                type: "list"
+                elements: "str"
+                required: false
+                description:
+                  - "Define preferred tenants."
+                  - "If not defined uses Dashboards default of C(['Private', 'Global'])."
+              multitenancy_enabled:
+                type: "str"
+                choices:
+                  - "true"
+                  - "false"
+                required: false
+                description:
+                  - "Enable or disable multitenancy in OpenSearch Dashboards."
+                  - "If not defined, uses Dashboards default of C(true)."
+          pid_file:
+            type: "str"
+            required: false
+            description:
+              - "Path to the PID-file."
+          log_file:
+            type: "str"
+            required: false
+            description:
+              - "Path to log file. The parent directory must exist before this role runs."
+          metrics_interval_milliseconds:
+            type: "int"
+            default: 5000
+            required: false
+            description:
+              - "Specifies the time interval in milliseconds to sample and process performance metrics."
+              - "The unit of time is milliseconds."
+              - "The lowest value is V(100) milliseconds."
+          locale:
+            type: "str"
+            required: false
+            choices:
+              - "en"
+              - "zh-CN"
+            description:
+              - "Set the localization for dates and number formats."
+              - "OpenSearch Dashboards currently supports English and Chinese localization."
+          branding:
+            type: "dict"
+            required: false
+            description:
+              - "Setup your own branding of OpenSearch Dashboards!"
+              - "Documentation strongly recommends using assets delivered by a webserver."
+            options:
+              asset_source:
+                type: "str"
+                required: false
+                description:
+                  - "Specify an *absolute* path to the assets directory."
+                  - "If you want to use local assets, you must set this parameter."
+              logo_default_url:
+                type: "str"
+                required: false
+                description:
+                  - "URL to the default logo."
+                  - "This role currently only supports remote source."
+              logo_darkmode_url:
+                type: "str"
+                required: false
+                description:
+                  - "URL to the dark mode logo."
+                  - "This role currently only supports remote source."
+              mark_default_url:
+                type: "str"
+                required: false
+                description:
+                  - "URL to the default mark."
+                  - "This role currently only supports remote source."
+              mark_darkmode_url:
+                type: "str"
+                required: false
+                description:
+                  - "URL to the dark mode mark."
+                  - "This role currently only supports remote source."
+              loading_default_url:
+                type: "str"
+                required: false
+                description:
+                  - "URL to the default loading image."
+                  - "This role currently only supports remote source."
+              loading_darkmode_url:
+                type: "str"
+                required: false
+                description:
+                  - "URL to the dark mode loading image."
+                  - "This role currently only supports remote source."
+              favicon_url:
+                type: "str"
+                required: false
+                description:
+                  - "URL to the favicon."
+                  - "This role currently only supports remote source."
+              application_title:
+                type: "str"
+                required: false
+                description:
+                  - "Application title to show"
+          telemetry:
+            type: "str"
+            choices:
+              - "true"
+              - "false"
+            required: false
+            default: false
+            description:
+              - "Define whether to enable or to suppress search telemetry data of OpenSearch."
+          nftables:
+            type: "dict"
+            required: false
+            description:
+              - "Define IPv4 and IPv6 addresses allowed to connect to OpenSearch Dashboards."
+              - "Regardless what you define, C(localhost) will always be allowed."
+            options:
+              whitelist_ipv4:
+                type: "list"
+                elements: "str"
+                description:
+                  - "List of IPv4 ranges in CIDR notation."
+                  - "It is not necessary to specify C('127.0.0.1')."
+              whitelist_ipv6:
+                type: "list"
+                elements: "str"
+                description:
+                  - "List of IPv6 ranges in CIDR notation."
+                  - "It is not necessary to specify C('::1')."

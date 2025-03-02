@@ -1,0 +1,15 @@
+---
+
+# Copyright: (c) 2025, Christian Siegel <molybdaen@mr42.org>
+# GNU General Public License v3.0+ (see LICENSE or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+
+- name: "install | Install OpenSearch Dashboards ..."
+  ansible.builtin.apt:
+    state: present
+    name: opensearch-dashboards
+    force_apt_get: true
+  become: true
+  tags:
+    - opensearch-dashboards
+    - opensearch-dashboards-install
